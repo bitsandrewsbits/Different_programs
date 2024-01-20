@@ -23,6 +23,8 @@ example_of_QR_code = [[1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
 					  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1]
 ]
 
+mask = 0
+
 def decode_QR_code_version_1():
 	# for right vertical code design
 	pass
