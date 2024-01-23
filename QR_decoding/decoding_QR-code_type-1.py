@@ -65,10 +65,8 @@ def reading_data_from_QR_content_part(QR_content_part = [[1, 0], [0, 1]]):
 	QR_content_bit_amount = len(QR_content_part) * len(QR_content_part[0])
 	QR_row_max_index = len(QR_content_part) - 1
 	for _ in range(0, QR_content_bit_amount):
-		if len(result_bits_string) == QR_content_part:
-			break
 
-		print(f'Current- coordinats: ({rows_index_i}, {columns_index_j})')
+		# print(f'Current- coordinats: ({rows_index_i}, {columns_index_j})')
 		result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 
 		# first phase - from down to up	
@@ -77,17 +75,15 @@ def reading_data_from_QR_content_part(QR_content_part = [[1, 0], [0, 1]]):
 		elif rows_index_i > 0 and columns_index_j % 2 == 0 and movement_vector_for_read_QR_content == 'up':
 			columns_index_j += 1
 			rows_index_i -= 1
-
 		# link between first and second algorithm phases
-		if rows_index_i == 0 and len(QR_content_part[:columns_index_j + 1]) % 4 == 0:
-			upper_arr_from_left_to_right = QR_content_part[rows_index_i][-2:][::-1]
-			upper_str_arr_from_left_to_right = [str(bit) for bit in upper_arr_from_left_to_right]
-			result_bits_string += ''.join(upper_str_arr_from_left_to_right)
-			columns_index_j -= 2
+		elif rows_index_i == 0 and movement_vector_for_read_QR_content == 'up':
+			columns_index_j -= 1
+			result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
+			columns_index_j -= 1
+			result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 			movement_vector_for_read_QR_content = 'down'
-			print(upper_str_arr_from_left_to_right)
-			print('Changing vector of reading to BOTTOM!')
-			continue
+			# print('Changing vector of reading to BOTTOM!')
+
 		
 		# second phase - from up to down
 		if rows_index_i < QR_row_max_index and columns_index_j % 2 != 0 and movement_vector_for_read_QR_content == 'down':
@@ -95,18 +91,18 @@ def reading_data_from_QR_content_part(QR_content_part = [[1, 0], [0, 1]]):
 		elif rows_index_i < QR_row_max_index and columns_index_j % 2 == 0 and movement_vector_for_read_QR_content == 'down':
 			columns_index_j += 1
 			rows_index_i += 1
-		
 		# link from second -> first phase of algorithm
-		if rows_index_i == QR_row_max_index and movement_vector_for_read_QR_content == 'down':
-			bottom_arr_from_right_to_left = QR_content_part[rows_index_i][columns_index_j - 1:columns_index_j + 1][::-1]
-			bottom_str_arr_from_right_to_left = [str(bit) for bit in bottom_arr_from_right_to_left]
-			result_bits_string += ''.join(bottom_str_arr_from_right_to_left)
-			columns_index_j -= 2
+		elif rows_index_i == QR_row_max_index and movement_vector_for_read_QR_content == 'down':
+			columns_index_j -= 1
+			result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
+			columns_index_j -= 1
 			movement_vector_for_read_QR_content = 'up'
-			print(bottom_str_arr_from_right_to_left)
-			print('Changing vector of reading to UP!')
+			# print('Changing vector of reading to UP!')
 
-	return result_bits_string
+		if len(result_bits_string) == QR_content_bit_amount:
+			break
+
+	return result_bits_string[:-20] # return only data bits, without 'n' symbols
 
 content_part_of_QR_code = get_content_part_from_QR_code(example_of_QR_code)
 show_matrix_in_pretty_format(content_part_of_QR_code)
