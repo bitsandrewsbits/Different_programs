@@ -25,10 +25,26 @@ example_of_QR_code = [[1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
 
 mask = 0
 
-def decode_QR_code_version_1():
-	# for right vertical code design
-	pass
+def decode_QR_code_version_1(QR_code_2D_matrix = [[0, 1], [1, 0]]):
+	content_part_of_QR_code = get_content_part_from_QR_code(QR_code_2D_matrix)
+	QR_bits_coordinates_values = get_QR_content_coordinates_values(content_part_of_QR_code)
+	right_QR_bits_coordinates_values = get_modified_QR_data_coordinates_values(QR_bits_coordinates_values)
+	print(right_QR_bits_coordinates_values)
 
+	QR_bit_sequence = get_QR_data_bit_sequence(right_QR_bits_coordinates_values)
+	print('QR bit sequence:', QR_bit_sequence)
+	print('bits sequence length =', len(QR_bit_sequence))
+
+	bits_mode = QR_bit_sequence[:4]
+	print('Bits mode:', bits_mode)
+	message_symbols_amount = int(QR_bit_sequence[4:12], 2)
+	print('Message length =', message_symbols_amount)
+
+	QR_message_bin_string = QR_bit_sequence[12:(12 + message_symbols_amount * 8)]
+	message_symbols_ascii_codes = get_ascii_codes_from_bin_str(QR_message_bin_string)
+	result_decode_message = get_string_from_ascii_codes(message_symbols_ascii_codes)
+
+	return result_decode_message
 
 def get_content_part_from_QR_code(QR_as_2D_array = [[1, 1], [0, 1]]):
 	rows_amount = 8
@@ -51,11 +67,6 @@ def get_content_part_from_QR_code(QR_as_2D_array = [[1, 1], [0, 1]]):
 
 	return result_QR_code_content_part
 
-def show_matrix_in_pretty_format(arr_2d = [[0, 0],[1, 1]]):
-	for i in range(len(arr_2d)):
-		print(arr_2d[i])
-
-
 def get_QR_content_coordinates_values(QR_content_part = [[1, 0], [0, 1]]):
 	result_bits_sequence_with_coordinates = {}
 
@@ -67,7 +78,6 @@ def get_QR_content_coordinates_values(QR_content_part = [[1, 0], [0, 1]]):
 	for _ in range(0, QR_content_bit_amount):
 
 		result_bits_sequence_with_coordinates[(rows_index_i, columns_index_j)] = QR_content_part[rows_index_i][columns_index_j]
-		# result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 
 		# first phase - from down to up	
 		if rows_index_i > 0 and columns_index_j % 2 != 0 and movement_vector_for_read_QR_content == 'up':
@@ -78,11 +88,9 @@ def get_QR_content_coordinates_values(QR_content_part = [[1, 0], [0, 1]]):
 		# link between first and second algorithm phases
 		elif rows_index_i == 0 and movement_vector_for_read_QR_content == 'up':
 			columns_index_j -= 1
-			# result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 			result_bits_sequence_with_coordinates[(rows_index_i, columns_index_j)] = QR_content_part[rows_index_i][columns_index_j]
 			columns_index_j -= 1
 			result_bits_sequence_with_coordinates[(rows_index_i, columns_index_j)] = QR_content_part[rows_index_i][columns_index_j]
-			# result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 			movement_vector_for_read_QR_content = 'down'
 			# print('Changing vector of reading to BOTTOM!')
 
@@ -97,7 +105,6 @@ def get_QR_content_coordinates_values(QR_content_part = [[1, 0], [0, 1]]):
 		elif rows_index_i == QR_row_max_index and movement_vector_for_read_QR_content == 'down':
 			columns_index_j -= 1
 			result_bits_sequence_with_coordinates[(rows_index_i, columns_index_j)] = QR_content_part[rows_index_i][columns_index_j]
-			# result_bits_string += str(QR_content_part[rows_index_i][columns_index_j])
 			columns_index_j -= 1
 			movement_vector_for_read_QR_content = 'up'
 			# print('Changing vector of reading to UP!')
@@ -106,7 +113,6 @@ def get_QR_content_coordinates_values(QR_content_part = [[1, 0], [0, 1]]):
 		if len(result_bits_sequence_with_coordinates) == 76:
 			break
 
-	# return result_bits_string[:-20] # return only data bits, without 'n' symbols
 	return result_bits_sequence_with_coordinates
 
 def get_modified_QR_data_coordinates_values(QR_coordinates_and_values = {(5, 5): 0}):
@@ -120,36 +126,27 @@ def get_modified_QR_data_coordinates_values(QR_coordinates_and_values = {(5, 5):
 
 	return new_QR_data_coordinates_values
 
-
 def get_QR_data_bit_sequence(QR_coordinates_and_values = {(5, 5): 0}):
 	result_bit_sequence = ''
 	for coordinates in QR_coordinates_and_values:
 		if (coordinates[0] + coordinates[1]) % 2 == mask:
 			bit_after_mask = (QR_coordinates_and_values[coordinates] - 1) ** 2
-			result_bit_sequence += str(bit_after_mask) + str(QR_coordinates_and_values[coordinates])
+			result_bit_sequence += str(bit_after_mask)
 		else:
 			result_bit = QR_coordinates_and_values[coordinates]
-			result_bit_sequence += str(0) + str(QR_coordinates_and_values[coordinates])
+			result_bit_sequence += str(result_bit)
 
 	return result_bit_sequence
 
+def get_ascii_codes_from_bin_str(bin_string):
+	ascii_codes = [int(bin_string[i:i + 8], 2) for i in range(0, len(bin_string), 8)]
 
-content_part_of_QR_code = get_content_part_from_QR_code(example_of_QR_code)
-show_matrix_in_pretty_format(content_part_of_QR_code)
+	return ascii_codes
 
-QR_bits_coordinates_values = get_QR_content_coordinates_values(content_part_of_QR_code)
-right_QR_bits_coordinates_values = get_modified_QR_data_coordinates_values(QR_bits_coordinates_values)
-print(right_QR_bits_coordinates_values)
+def get_string_from_ascii_codes(ascii_codes):
+	string = ''.join([chr(ascii_value) for ascii_value in ascii_codes])
 
-QR_bit_sequence = get_QR_data_bit_sequence(right_QR_bits_coordinates_values)
-print('QR bit sequence:', QR_bit_sequence)
-print('bits sequence length =', len(QR_bit_sequence))
+	return string
 
-
-
-
-
-
-
-
-
+QR_decoded_message = decode_QR_code_version_1(example_of_QR_code)
+print('Decoded message:', QR_decoded_message)
