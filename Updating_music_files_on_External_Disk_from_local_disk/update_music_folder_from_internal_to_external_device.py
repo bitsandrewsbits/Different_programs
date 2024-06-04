@@ -12,6 +12,7 @@
 # Also show process stages and their results.
 
 import platform
+import psutil
 
 class Music_Dir_on_Local_Disk:
 	def __init__(self):
@@ -23,6 +24,12 @@ class Music_Dir_on_Local_Disk:
 		# print('OS type:', self.operation_system_type)
 		return self.operation_system_type
 
+	def define_all_partitions_on_local_disk(self):
+		for disk_partition in psutil.disk_partitions():
+			if disk_partition.fstype:
+				print('Root dir for partition:', disk_partition.mountpoint)
 
-# test_obj = Music_Dir_on_Local_Disk()
+
+test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
+test_obj.define_all_partitions_on_local_disk()
