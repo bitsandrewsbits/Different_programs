@@ -17,19 +17,29 @@ import psutil
 class Music_Dir_on_Local_Disk:
 	def __init__(self):
 		self.operation_system_type = platform.system()
-		self.disk_partitions_and_partitions_abs_path = {}
-		self.directories_with_MP3_files_amount = {}
+		self.disk_partitions_mountpoints = []
+		self.not_empty_directories_with_MP3_files = {}
+		self.target_mountpoint = ''
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
 		return self.operation_system_type
 
-	def define_all_partitions_on_local_disk(self):
+	def get_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
-			if disk_partition.fstype:
-				print('Root dir for partition:', disk_partition.mountpoint)
+			print('Root dir for partition:', disk_partition.mountpoint)
+			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
+
+	def get_target_mountpoint(self):
+		if self.get_operation_system_type() == 'Linux':
+			self.target_mountpoint = '/media/'
+			self.get_log_in_user_to_Linux_system() # in future
+
+	def define_music_folder_on_local_disk(self):
+		if self.get_operation_system_type() == 'Linux':
+			self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
 
 
 test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
-test_obj.define_all_partitions_on_local_disk()
+test_obj.get_all_partitions_mountpoints_on_local_disk()
