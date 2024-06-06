@@ -13,13 +13,15 @@
 
 import platform
 import psutil
+import os
 
 class Music_Dir_on_Local_Disk:
 	def __init__(self):
 		self.operation_system_type = platform.system()
 		self.disk_partitions_mountpoints = []
 		self.not_empty_directories_with_MP3_files = {}
-		self.target_mountpoint = ''
+		self.target_system_path = ''
+		self.current_login_user = self.define_log_in_user_to_Linux_system()
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -30,10 +32,24 @@ class Music_Dir_on_Local_Disk:
 			print('Root dir for partition:', disk_partition.mountpoint)
 			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
 
-	def get_target_mountpoint(self):
+	def get_target_system_path_for_searching_music_folder(self):
 		if self.get_operation_system_type() == 'Linux':
-			self.target_mountpoint = '/media/'
-			self.get_log_in_user_to_Linux_system() # in future
+			self.target_system_path = '/media/'
+			self.target_system_path += self.current_login_user + '/'
+
+
+	def get_filenames_from_dir(self, abs_path_to_dir):
+		#finding files in certain dir(only one dir level)
+
+	def get_dirnames_from_dir(self, abs_path_to_dir):
+		#finding directory names in certain dir(only one dir level)
+
+	def define_log_in_user_to_Linux_system(self):
+		return os.getlogin()
+
+	def get_log_in_user_to_Linux_system(self):
+		print('current login user:', self.current_login_user)
+		return self.current_login_user
 
 	def define_music_folder_on_local_disk(self):
 		if self.get_operation_system_type() == 'Linux':
@@ -42,4 +58,8 @@ class Music_Dir_on_Local_Disk:
 
 test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
-test_obj.get_all_partitions_mountpoints_on_local_disk()
+# test_obj.get_all_partitions_mountpoints_on_local_disk()
+test_obj.get_log_in_user_to_Linux_system()
+
+
+
