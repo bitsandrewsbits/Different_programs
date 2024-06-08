@@ -35,14 +35,20 @@ class Music_Dir_on_Local_Disk:
 	def get_target_system_path_for_searching_music_folder(self):
 		if self.get_operation_system_type() == 'Linux':
 			self.target_system_path = '/media/'
-			self.target_system_path += self.current_login_user + '/'
+			self.target_system_path += self.current_login_user
+
+		return self.target_system_path
 
 
-	def get_filenames_from_dir(self, abs_path_to_dir):
-		#finding files in certain dir(only one dir level)
+	def get_filenames_in_dir(self, abs_path_to_dir):
+		#finding all files and dirs in certain dir(only one dir level)
+		return os.listdir(abs_path_to_dir)
 
-	def get_dirnames_from_dir(self, abs_path_to_dir):
-		#finding directory names in certain dir(only one dir level)
+	def filename_is_directory(self, filename):
+		if os.path.isdir(filename):
+			return True
+		else:
+			return False
 
 	def define_log_in_user_to_Linux_system(self):
 		return os.getlogin()
@@ -59,7 +65,8 @@ class Music_Dir_on_Local_Disk:
 test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
 # test_obj.get_all_partitions_mountpoints_on_local_disk()
-test_obj.get_log_in_user_to_Linux_system()
-
+# test_obj.get_log_in_user_to_Linux_system()
+# files_in_certain_dir = test_obj.get_filenames_in_dir('/media/')
+# print(files_in_certain_dir)
 
 
