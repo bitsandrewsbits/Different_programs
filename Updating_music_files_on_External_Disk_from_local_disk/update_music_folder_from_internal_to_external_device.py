@@ -32,13 +32,35 @@ class Music_Dir_on_Local_Disk:
 			print('Root dir for partition:', disk_partition.mountpoint)
 			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
 
+	def find_directory_with_majority_MP3_files(self):
+		# this method - algorithm of finding music directory
+
+	def get_amount_of_MP3_in_dir(self, certain_dir):
+		all_filenames_in_dir = os.listdir(certain_dir)
+		self.not_empty_directories_with_MP3_files[certain_dir]
+		for filename in all_filenames_in_dir:
+			if not os.path.isdir(filename) and filename[-3:] == 'mp3':
+				self.not_empty_directories_with_MP3_files[certain_dir]
+
+	def mp3_files_not_exist_in_dir(self, certain_dir):
+		all_filenames_in_dir = os.listdir(certain_dir)
+		self.not_empty_directories_with_MP3_files[certain_dir]
+		for filename in all_filenames_in_dir:
+			if not os.path.isdir(filename) and filename[-3:] == 'mp3':
+				return False
+
+		return True
+
+	def get_only_files_in_dir(self, certain_dir):
+		# method for returning only files from dir
+
+
 	def get_target_system_path_for_searching_music_folder(self):
 		if self.get_operation_system_type() == 'Linux':
 			self.target_system_path = '/media/'
 			self.target_system_path += self.current_login_user
 
 		return self.target_system_path
-
 
 	def get_filenames_in_dir(self, abs_path_to_dir):
 		#finding all files and dirs in certain dir(only one dir level)
