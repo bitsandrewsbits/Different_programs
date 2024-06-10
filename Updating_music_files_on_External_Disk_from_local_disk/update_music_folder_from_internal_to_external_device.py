@@ -25,7 +25,7 @@ class Music_Dir_on_Local_Disk:
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
-		return self.operation_system_type
+		return self.operation_system_type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
 
 	def get_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
@@ -36,6 +36,7 @@ class Music_Dir_on_Local_Disk:
 		# this method - algorithm of finding music directory
 
 	def get_amount_of_MP3_in_dir(self, certain_dir):
+		# TODO: need refactoring
 		all_filenames_in_dir = os.listdir(certain_dir)
 		self.not_empty_directories_with_MP3_files[certain_dir]
 		for filename in all_filenames_in_dir:
@@ -43,16 +44,24 @@ class Music_Dir_on_Local_Disk:
 				self.not_empty_directories_with_MP3_files[certain_dir]
 
 	def mp3_files_not_exist_in_dir(self, certain_dir):
-		all_filenames_in_dir = os.listdir(certain_dir)
-		self.not_empty_directories_with_MP3_files[certain_dir]
-		for filename in all_filenames_in_dir:
-			if not os.path.isdir(filename) and filename[-3:] == 'mp3':
+		files_in_dir = self.get_only_files_in_dir(certain_dir)
+		for file in files_in_dir:
+			if filename[-3:] == 'mp3':
 				return False
 
 		return True
 
 	def get_only_files_in_dir(self, certain_dir):
-		# method for returning only files from dir
+		all_filenames_in_dir = os.listdir(certain_dir)
+		only_files_in_dir = []
+		for filename in all_filenames_in_dir:
+			if not os.path.isdir(filename):
+				only_files_in_dir.append(filename)
+
+		return only_files_in_dir
+
+	def get_directories_in_dir(self, certain_dir):
+		#TODO: method for returning only dir names in certain folder.
 
 
 	def get_target_system_path_for_searching_music_folder(self):
