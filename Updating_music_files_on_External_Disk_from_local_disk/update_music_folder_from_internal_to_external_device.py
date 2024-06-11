@@ -61,7 +61,13 @@ class Music_Dir_on_Local_Disk:
 		return only_files_in_dir
 
 	def get_directories_in_dir(self, certain_dir):
-		#TODO: method for returning only dir names in certain folder.
+		dirs_in_certain_dir = []
+		all_filenames_in_dir = self.get_filenames_in_dir(certain_dir)
+		for filename in all_filenames_in_dir:
+			if os.path.isdir(filename):
+				dirs_in_certain_dir.append(filename)
+
+		return dirs_in_certain_dir
 
 
 	def get_target_system_path_for_searching_music_folder(self):
@@ -72,7 +78,6 @@ class Music_Dir_on_Local_Disk:
 		return self.target_system_path
 
 	def get_filenames_in_dir(self, abs_path_to_dir):
-		#finding all files and dirs in certain dir(only one dir level)
 		return os.listdir(abs_path_to_dir)
 
 	def filename_is_directory(self, filename):
