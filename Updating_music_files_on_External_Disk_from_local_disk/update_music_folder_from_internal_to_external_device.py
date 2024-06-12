@@ -25,7 +25,7 @@ class Music_Dir_on_Local_Disk:
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
-		return self.operation_system_type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
+		return self.operation_system_type
 
 	def get_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
@@ -35,13 +35,10 @@ class Music_Dir_on_Local_Disk:
 	def find_directory_with_majority_MP3_files(self):
 		# this method - algorithm of finding music directory
 
-	def get_amount_of_MP3_in_dir(self, certain_dir):
-		# TODO: need refactoring
-		all_filenames_in_dir = os.listdir(certain_dir)
-		self.not_empty_directories_with_MP3_files[certain_dir]
-		for filename in all_filenames_in_dir:
-			if not os.path.isdir(filename) and filename[-3:] == 'mp3':
-				self.not_empty_directories_with_MP3_files[certain_dir]
+	# TODO: need refactoring
+	def set_dirnames_with_MP3_files_amount(self, certain_dir):
+		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
+		# it's search in depth and in width. maybe combination.
 
 	def mp3_files_not_exist_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
@@ -50,6 +47,16 @@ class Music_Dir_on_Local_Disk:
 				return False
 
 		return True
+
+	def get_amount_of_MP3_files_in_dir(self, certain_dir):
+		files_in_dir = self.get_only_files_in_dir(certain_dir)
+		amount_of_MP3_files_in_dir = 0
+
+		for file in files_in_dir:
+			if file[-3:] == 'mp3':
+				amount_of_MP3_files_in_dir += 1
+
+		return amount_of_MP3_files_in_dir
 
 	def get_only_files_in_dir(self, certain_dir):
 		all_filenames_in_dir = os.listdir(certain_dir)
@@ -93,9 +100,9 @@ class Music_Dir_on_Local_Disk:
 		print('current login user:', self.current_login_user)
 		return self.current_login_user
 
-	def define_music_folder_on_local_disk(self):
-		if self.get_operation_system_type() == 'Linux':
-			self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
+	# def define_music_folder_on_local_disk(self):
+		# if self.get_operation_system_type() == 'Linux':
+		# 	self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
 
 
 test_obj = Music_Dir_on_Local_Disk()
