@@ -40,6 +40,7 @@ class Music_Dir_on_Local_Disk:
 		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
 		# it's search in depth and in width. maybe combination.
 
+
 	def mp3_files_not_exist_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
 		for file in files_in_dir:
@@ -47,6 +48,14 @@ class Music_Dir_on_Local_Disk:
 				return False
 
 		return True
+
+	def directories_exists_on_dir(self, certain_dir):
+		dirnames = self.get_only_directories_in_dir(certain_dir)
+
+		if dirnames != []:
+			return True
+		else:
+			return False
 
 	def get_amount_of_MP3_files_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
@@ -67,7 +76,7 @@ class Music_Dir_on_Local_Disk:
 
 		return only_files_in_dir
 
-	def get_directories_in_dir(self, certain_dir):
+	def get_only_directories_in_dir(self, certain_dir):
 		dirs_in_certain_dir = []
 		all_filenames_in_dir = self.get_filenames_in_dir(certain_dir)
 		for filename in all_filenames_in_dir:
@@ -75,7 +84,6 @@ class Music_Dir_on_Local_Disk:
 				dirs_in_certain_dir.append(filename)
 
 		return dirs_in_certain_dir
-
 
 	def get_target_system_path_for_searching_music_folder(self):
 		if self.get_operation_system_type() == 'Linux':
