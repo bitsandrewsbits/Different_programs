@@ -19,7 +19,7 @@ class Music_Dir_on_Local_Disk:
 	def __init__(self):
 		self.operation_system_type = platform.system()
 		self.disk_partitions_mountpoints = []
-		self.not_empty_directories_with_MP3_files = {}
+		self.directories_with_nonzero_amount_of_MP3_files = {}
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
 
@@ -39,6 +39,12 @@ class Music_Dir_on_Local_Disk:
 	def set_dirnames_with_MP3_files_amount(self, certain_dir):
 		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
 		# it's search in depth and in width. maybe combination.
+
+	# this method will execute recursively until nondir dir will be found. 
+	def set_dir_and_nonzero_amount_of_MP3_files(self, temp_dir):
+		dir_for_check_on_current_level = self.get_only_directories_in_dir(temp_dir)
+		
+		if self.set_dir_and_nonzero_amount_of_MP3_files()
 
 
 	def mp3_files_not_exist_in_dir(self, certain_dir):
