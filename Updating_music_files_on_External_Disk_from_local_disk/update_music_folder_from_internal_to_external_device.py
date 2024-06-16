@@ -46,6 +46,8 @@ class Music_Dir_on_Local_Disk:
 		
 		if self.set_dir_and_nonzero_amount_of_MP3_files()
 
+	def set_dirs_by_levels_from_root_dir(self, root_dir):
+		pass
 
 	def mp3_files_not_exist_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
