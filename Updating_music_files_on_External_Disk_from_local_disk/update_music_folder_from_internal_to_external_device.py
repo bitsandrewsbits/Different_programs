@@ -22,6 +22,7 @@ class Music_Dir_on_Local_Disk:
 		self.directories_with_nonzero_amount_of_MP3_files = {}
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
+		self.dir_level_number = 0
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -40,22 +41,31 @@ class Music_Dir_on_Local_Disk:
 		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
 		# it's search in depth and in width. maybe combination.
 
-	# this method will execute recursively until nondir dir will be found. 
-	def set_dir_and_nonzero_amount_of_MP3_files(self, temp_dir):
-		dir_for_check_on_current_level = self.get_only_directories_in_dir(temp_dir)
-		
-		if self.set_dir_and_nonzero_amount_of_MP3_files()
+	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
+	def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_dir):
+		# first step - get dirs list on first level
+		current_level_dirs = self.get_only_directories_in_dir(root_dir)
+		if self.mp3_files_exist_in_dir(root_dir):
+			self.directories_with_nonzero_amount_of_MP3_files[root_dir] = self.get_amount_of_MP3_files_in_dir(root_dir)
+		next_level_dirs = current_level_dirs
 
-	def set_dirs_by_levels_from_root_dir(self, root_dir):
-		pass
+		# executing while in next level dirs is nothing, but files.
+		while next_level_dirs != []:
+			next_level_dirs = []
+			for current_level_dir in current_level_dirs:
+				if self.directories_exists_on_dir(current_level_dir):
+					next_level_dirs_for_current_level_dir = self.get_only_directories_in_dir(current_level_dir)
+					next_level_dirs.append(next_level_dirs_for_current_level_dir)
 
-	def mp3_files_not_exist_in_dir(self, certain_dir):
+
+
+	def mp3_files_exist_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
 		for file in files_in_dir:
 			if filename[-3:] == 'mp3':
-				return False
+				return True
 
-		return True
+		return False
 
 	def directories_exists_on_dir(self, certain_dir):
 		dirnames = self.get_only_directories_in_dir(certain_dir)
