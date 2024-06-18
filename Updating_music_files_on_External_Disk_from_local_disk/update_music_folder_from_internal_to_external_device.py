@@ -33,11 +33,11 @@ class Music_Dir_on_Local_Disk:
 			print('Root dir for partition:', disk_partition.mountpoint)
 			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
 
-	def find_directory_with_majority_MP3_files(self):
+	# def find_directory_with_majority_MP3_files(self):
 		# this method - algorithm of finding music directory
 
 	# TODO: need refactoring
-	def set_dirnames_with_MP3_files_amount(self, certain_dir):
+	# def set_dirnames_with_MP3_files_amount(self, certain_dir):
 		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
 		# it's search in depth and in width. maybe combination.
 
@@ -52,16 +52,23 @@ class Music_Dir_on_Local_Disk:
 		# executing while in next level dirs is nothing, but files.
 		while next_level_dirs != []:
 			next_level_dirs = []
+			print('current level dirs:', current_level_dirs)
 			for current_level_dir in current_level_dirs:
+				if self.mp3_files_exist_in_dir(current_level_dir):
+					self.directories_with_nonzero_amount_of_MP3_files[current_level_dir] = self.get_amount_of_MP3_files_in_dir(current_level_dir)
 				if self.directories_exists_on_dir(current_level_dir):
 					next_level_dirs_for_current_level_dir = self.get_only_directories_in_dir(current_level_dir)
 					next_level_dirs.append(next_level_dirs_for_current_level_dir)
 
+			current_level_dirs = next_level_dirs
+
+		print('Result of MP3 nonzero folders:')
+		print(self.directories_with_nonzero_amount_of_MP3_files)
 
 
 	def mp3_files_exist_in_dir(self, certain_dir):
 		files_in_dir = self.get_only_files_in_dir(certain_dir)
-		for file in files_in_dir:
+		for filename in files_in_dir:
 			if filename[-3:] == 'mp3':
 				return True
 
@@ -108,6 +115,7 @@ class Music_Dir_on_Local_Disk:
 			self.target_system_path = '/media/'
 			self.target_system_path += self.current_login_user
 
+		print('Target dir for searching:', self.target_system_path)
 		return self.target_system_path
 
 	def get_filenames_in_dir(self, abs_path_to_dir):
@@ -134,8 +142,7 @@ class Music_Dir_on_Local_Disk:
 test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
 # test_obj.get_all_partitions_mountpoints_on_local_disk()
-# test_obj.get_log_in_user_to_Linux_system()
-# files_in_certain_dir = test_obj.get_filenames_in_dir('/media/')
-# print(files_in_certain_dir)
-
+test_obj.get_log_in_user_to_Linux_system()
+target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
+test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
