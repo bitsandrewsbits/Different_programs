@@ -82,8 +82,8 @@ class Music_Dir_on_Local_Disk:
 		else:
 			return False
 
-	def get_amount_of_MP3_files_in_dir(self, certain_dir):
-		files_in_dir = self.get_only_files_in_dir(certain_dir)
+	def get_amount_of_MP3_files_in_dir(self, certain_abs_dir_path):
+		files_in_dir = self.get_only_files_in_dir(certain_abs_dir_path)
 		amount_of_MP3_files_in_dir = 0
 
 		for file in files_in_dir:
@@ -92,20 +92,22 @@ class Music_Dir_on_Local_Disk:
 
 		return amount_of_MP3_files_in_dir
 
-	def get_only_files_in_dir(self, certain_dir):
-		all_filenames_in_dir = os.listdir(certain_dir)
+	def get_only_files_in_dir(self, certain_abs_dir_path):
+		all_filenames_in_dir = os.listdir(certain_abs_dir_path)
 		only_files_in_dir = []
 		for filename in all_filenames_in_dir:
-			if not os.path.isdir(filename):
+			temp_abs_filename_path = certain_abs_dir_path + '/' + filename
+			if not os.path.isdir(temp_abs_filename_path):
 				only_files_in_dir.append(filename)
 
 		return only_files_in_dir
 
-	def get_only_directories_in_dir(self, certain_dir):
+	def get_only_directories_in_dir(self, certain_abs_dir_path):
 		dirs_in_certain_dir = []
-		all_filenames_in_dir = self.get_filenames_in_dir(certain_dir)
+		all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
 		for filename in all_filenames_in_dir:
-			if os.path.isdir(filename):
+			temp_abs_filename_path = certain_abs_dir_path + '/' + filename
+			if os.path.isdir(temp_abs_filename_path):
 				dirs_in_certain_dir.append(filename)
 
 		return dirs_in_certain_dir
@@ -142,6 +144,8 @@ class Music_Dir_on_Local_Disk:
 test_obj = Music_Dir_on_Local_Disk()
 # test_obj.get_operation_system_type()
 # test_obj.get_all_partitions_mountpoints_on_local_disk()
+# test1 = test_obj.get_filenames_in_dir('/media/kov_andrew')
+# print('dirs in dir:', test1)
 test_obj.get_log_in_user_to_Linux_system()
 target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
 test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
