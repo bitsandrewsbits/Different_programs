@@ -67,7 +67,18 @@ class Music_Dir_on_Local_Disk:
 		print('Result of MP3 nonzero folders:')
 		print(self.directories_with_nonzero_amount_of_MP3_files)
 
-	def get_abs_pathes_from_one_dir(self, target_abs_dir_path, dirnames_in_target_dir):
+	def get_abs_dir_pathes_of_all_next_level_dirs(self, abs_current_level_dirs_pathes):
+		all_next_level_abs_dir_pathes = []
+
+		for abs_current_level_dir_path in abs_current_level_dirs_pathes:
+			dirnames_in_dir = self.get_only_directories_in_dir(abs_current_level_dir_path)
+			next_level_abs_dir_pathes_in_current_level_dir = \
+			self.get_abs_dir_pathes_from_one_dir(abs_current_level_dir_path, dirnames_in_dir)
+			all_next_level_abs_dir_pathes.append(next_level_abs_dir_pathes_in_current_level_dir)
+
+		return all_next_level_abs_dir_pathes
+
+	def get_abs_dir_pathes_from_one_dir(self, target_abs_dir_path, dirnames_in_target_dir):
 		result_abs_pathes_for_target_dir = []
 		for dirname in dirnames_in_target_dir:
 			temp_abs_dir_path = target_abs_dir_path + '/' + dirname
