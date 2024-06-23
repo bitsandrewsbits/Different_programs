@@ -43,12 +43,7 @@ class Music_Dir_on_Local_Disk:
 
 	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
 	def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
-		# init empty dict for temp abs path dir in current dir level
 		# first step - get dirs list on first level
-		# if self.mp3_files_exist_in_dir(root_abs_dir_path):
-		# 	self.directories_with_nonzero_amount_of_MP3_files[root_abs_dir_path] = \
-		# 	self.get_amount_of_MP3_files_in_dir(root_abs_dir_path)
-		# next_level_abs_dirs_pathes = self.get_abs_dir_pathes_from_one_dir(root_abs_dir_path, current_level_dirs)
 		current_level_abs_dirs_pathes = [root_abs_dir_path]
 		next_level_abs_dirs_pathes = ['not empty']
 
@@ -56,22 +51,22 @@ class Music_Dir_on_Local_Disk:
 		while next_level_abs_dirs_pathes != []:
 			next_level_abs_dirs_pathes = []
 			print('Current level abs dir pathes:', current_level_abs_dirs_pathes)
+			print('\n\n')
 			for current_level_abs_dir_path in current_level_abs_dirs_pathes:
 				if self.mp3_files_exist_in_dir(current_level_abs_dir_path):
 					self.directories_with_nonzero_amount_of_MP3_files[current_level_abs_dir_path] = \
 					self.get_amount_of_MP3_files_in_dir(current_level_abs_dir_path)
 				if self.directories_exists_in_dir(current_level_abs_dir_path):
 					next_level_dirnames = self.get_only_directories_in_dir(current_level_abs_dir_path)
-					next_level_abs_dirs_pathes = \
+					# print('Next Level dirs:', next_level_dirnames)
+					next_level_abs_dirs_pathes_from_one_dir = \
 					self.get_abs_dir_pathes_from_one_dir(current_level_abs_dir_path, next_level_dirnames)
-					next_level_abs_dirs_pathes += next_level_abs_dirs_pathes
+				next_level_abs_dirs_pathes += next_level_abs_dirs_pathes_from_one_dir
 
 			current_level_abs_dirs_pathes = next_level_abs_dirs_pathes
 
 		print('Result of MP3 nonzero folders:')
 		print(self.directories_with_nonzero_amount_of_MP3_files)
-
-
 
 	def get_abs_dir_pathes_of_all_next_level_dirs(self, abs_current_level_dirs_pathes):
 		all_next_level_abs_dir_pathes = []
@@ -100,8 +95,8 @@ class Music_Dir_on_Local_Disk:
 
 		return False
 
-	def directories_exists_in_dir(self, certain_dir):
-		dirnames = self.get_only_directories_in_dir(certain_dir)
+	def directories_exists_in_dir(self, certain_abs_dir_path):
+		dirnames = self.get_only_directories_in_dir(certain_abs_dir_path)
 
 		if dirnames != []:
 			return True
@@ -119,7 +114,8 @@ class Music_Dir_on_Local_Disk:
 		return amount_of_MP3_files_in_dir
 
 	def get_only_files_in_dir(self, certain_abs_dir_path):
-		all_filenames_in_dir = os.listdir(certain_abs_dir_path)
+		all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
+
 		only_files_in_dir = []
 		for filename in all_filenames_in_dir:
 			temp_abs_filename_path = certain_abs_dir_path + '/' + filename
@@ -147,7 +143,10 @@ class Music_Dir_on_Local_Disk:
 		return self.target_system_path
 
 	def get_filenames_in_dir(self, abs_path_to_dir):
-		return os.listdir(abs_path_to_dir)
+		try:
+			return os.listdir(abs_path_to_dir)
+		except Exception as error:
+			return ['error(permission denied)']
 
 	def filename_is_directory(self, filename):
 		if os.path.isdir(filename):
