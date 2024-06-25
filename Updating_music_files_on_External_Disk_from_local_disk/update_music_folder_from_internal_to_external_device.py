@@ -23,6 +23,7 @@ class Music_Dir_on_Local_Disk:
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
 		self.dir_level_number = 0
+		self.excluded_dirnames_for_search = ['lib', 'bin', 'plugins']  # list can be extended
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -67,6 +68,12 @@ class Music_Dir_on_Local_Disk:
 
 		print('Result of MP3 nonzero folders:')
 		print(self.directories_with_nonzero_amount_of_MP3_files)
+
+	def dir_is_excluded_from_search(self, dirname):
+		if dirname in self.excluded_dirnames_for_search:
+			return True
+		else:
+			return False
 
 	def get_abs_dir_pathes_of_all_next_level_dirs(self, abs_current_level_dirs_pathes):
 		all_next_level_abs_dir_pathes = []
