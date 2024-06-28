@@ -37,10 +37,12 @@ class Music_Dir_on_Local_Disk:
 	# def find_directory_with_majority_MP3_files(self):
 		# this method - algorithm of finding music directory
 
-	# TODO: need refactoring
-	# def set_dirnames_with_MP3_files_amount(self, certain_dir):
-		# need to develop method for gathering info about all dir with non-zero amount of MP3 files.
-		# it's search in depth and in width. maybe combination.
+	# search algorithm - search in depth
+	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
+		# example of data structure for algorithm
+		dirs_by_levels_and_checked_status = {('dirname', 1): 'Unchecked'} 
+		
+
 
 	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
 	def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
