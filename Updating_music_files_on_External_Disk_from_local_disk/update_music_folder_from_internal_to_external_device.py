@@ -20,10 +20,11 @@ class Music_Dir_on_Local_Disk:
 		self.operation_system_type = platform.system()
 		self.disk_partitions_mountpoints = []
 		self.directories_with_nonzero_amount_of_MP3_files = {}
+		self.dirs_by_levels_and_checked_status = {}  # {'dir_abs_path': (1, 'Unchecked')} - (dir_level_int, str)
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
 		self.dir_level_number = 0
-		self.excluded_dirnames_for_search = ['SOFT', 'Next_STEP_-since_2020_go', 'PYTHON__Cource__DEV']  # list can be extended
+		self.excluded_dirnames_for_search = ['SOFT']  # list can be extended
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -39,10 +40,18 @@ class Music_Dir_on_Local_Disk:
 
 	# search algorithm - search in depth
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
-		# example of data structure for algorithm
-		dirs_by_levels_and_checked_status = {('dirname', 1): 'Unchecked'} 
+		pass
 		
 
+	def set_next_search_dir_level_for_certain_dir(self, certain_abs_dir_path):
+		pass
+
+	def filesystem_tree_for_certain_dir_entire_checked(self, certain_abs_dir_path):
+		for abs_dir_path in self.dirs_by_levels_and_checked_status:
+			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Unchecked':
+				return False
+
+		return True
 
 	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
 	def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
