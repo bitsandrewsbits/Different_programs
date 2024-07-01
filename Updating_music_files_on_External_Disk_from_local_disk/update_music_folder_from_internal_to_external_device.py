@@ -20,10 +20,10 @@ class Music_Dir_on_Local_Disk:
 		self.operation_system_type = platform.system()
 		self.disk_partitions_mountpoints = []
 		self.directories_with_nonzero_amount_of_MP3_files = {}
-		self.dirs_by_levels_and_checked_status = {}  # {'dir_abs_path': (1, 'Unchecked')} - (dir_level_int, str)
+		self.dirs_by_levels_and_checked_status = {}  # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
-		self.dir_level_number = 0
+		self.dir_level_number_for_search = 0
 		self.excluded_dirnames_for_search = ['SOFT']  # list can be extended
 
 	def get_operation_system_type(self):
@@ -41,10 +41,18 @@ class Music_Dir_on_Local_Disk:
 	# search algorithm - search in depth
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
 		pass
-		
 
-	def set_next_search_dir_level_for_certain_dir(self, certain_abs_dir_path):
-		pass
+	def set_search_dir_level_for_dir(self, certain_abs_dir_path, dir_level: int):
+		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
+
+	def set_search_status_as_checked_for_dir(self, certain_abs_dir_path):
+		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
+
+	def next_level_dirs_checked_within_one_certain_dir(self, certain_abs_dir_path, dir_level: int):
+		if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Checked':
+			return True
+		else:
+			return False
 
 	def filesystem_tree_for_certain_dir_entire_checked(self, certain_abs_dir_path):
 		for abs_dir_path in self.dirs_by_levels_and_checked_status:
@@ -54,32 +62,32 @@ class Music_Dir_on_Local_Disk:
 		return True
 
 	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
-	def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
-		# first step - get dirs list on first level
-		current_level_abs_dirs_pathes = [root_abs_dir_path]
-		next_level_abs_dirs_pathes = ['not empty']
+	# def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
+	# 	# first step - get dirs list on first level
+	# 	current_level_abs_dirs_pathes = [root_abs_dir_path]
+	# 	next_level_abs_dirs_pathes = ['not empty']
 
-		# executing while in next level dirs is nothing, but files.
-		while next_level_abs_dirs_pathes != []:
-			next_level_abs_dirs_pathes = []
-			print('Current level abs dir pathes:', current_level_abs_dirs_pathes)
-			print('\n\n')
-			for current_level_abs_dir_path in current_level_abs_dirs_pathes:
-				if self.mp3_files_exist_in_dir(current_level_abs_dir_path):
-					self.directories_with_nonzero_amount_of_MP3_files[current_level_abs_dir_path] = \
-					self.get_amount_of_MP3_files_in_dir(current_level_abs_dir_path)
-				if self.directories_exists_in_dir(current_level_abs_dir_path):
-					next_level_dirnames = self.get_only_directories_in_dir(current_level_abs_dir_path)
-					next_level_dirnames_without_excluded_dirs = self.get_dirs_list_without_excluded_dirs(next_level_dirnames)
-					# print('Next Level dirs:', next_level_dirnames_without_excluded_dirs)
-					next_level_abs_dirs_pathes_from_one_dir = \
-					self.get_abs_dir_pathes_from_one_dir(current_level_abs_dir_path, next_level_dirnames_without_excluded_dirs)
-				next_level_abs_dirs_pathes += next_level_abs_dirs_pathes_from_one_dir
+	# 	# executing while in next level dirs is nothing, but files.
+	# 	while next_level_abs_dirs_pathes != []:
+	# 		next_level_abs_dirs_pathes = []
+	# 		print('Current level abs dir pathes:', current_level_abs_dirs_pathes)
+	# 		print('\n\n')
+	# 		for current_level_abs_dir_path in current_level_abs_dirs_pathes:
+	# 			if self.mp3_files_exist_in_dir(current_level_abs_dir_path):
+	# 				self.directories_with_nonzero_amount_of_MP3_files[current_level_abs_dir_path] = \
+	# 				self.get_amount_of_MP3_files_in_dir(current_level_abs_dir_path)
+	# 			if self.directories_exists_in_dir(current_level_abs_dir_path):
+	# 				next_level_dirnames = self.get_only_directories_in_dir(current_level_abs_dir_path)
+	# 				next_level_dirnames_without_excluded_dirs = self.get_dirs_list_without_excluded_dirs(next_level_dirnames)
+	# 				# print('Next Level dirs:', next_level_dirnames_without_excluded_dirs)
+	# 				next_level_abs_dirs_pathes_from_one_dir = \
+	# 				self.get_abs_dir_pathes_from_one_dir(current_level_abs_dir_path, next_level_dirnames_without_excluded_dirs)
+	# 			next_level_abs_dirs_pathes += next_level_abs_dirs_pathes_from_one_dir
 
-			current_level_abs_dirs_pathes = next_level_abs_dirs_pathes
+	# 		current_level_abs_dirs_pathes = next_level_abs_dirs_pathes
 
-		print('Result of MP3 nonzero folders:')
-		print(self.directories_with_nonzero_amount_of_MP3_files)
+	# 	print('Result of MP3 nonzero folders:')
+	# 	print(self.directories_with_nonzero_amount_of_MP3_files)
 
 	def get_dirs_list_without_excluded_dirs(self, dirnames):
 		result_dirs = []
@@ -202,5 +210,6 @@ test_obj = Music_Dir_on_Local_Disk()
 # print('dirs in dir:', test1)
 test_obj.get_log_in_user_to_Linux_system()
 target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
-test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
+# test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
+# testing search in depth algorithm - (in future commits)
