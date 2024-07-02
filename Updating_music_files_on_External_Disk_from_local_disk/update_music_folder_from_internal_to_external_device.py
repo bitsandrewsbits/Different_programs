@@ -40,7 +40,10 @@ class Music_Dir_on_Local_Disk:
 
 	# search algorithm - search in depth
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
-		pass
+		self.dirs_by_levels_and_checked_status[root_abs_dir_path] = [0, 'Unchecked']    # start point for searching
+
+		while not self.filesystem_tree_for_certain_dir_entire_checked(root_abs_dir_path):
+			
 
 	def set_search_dir_level_for_dir(self, certain_abs_dir_path, dir_level: int):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
@@ -48,7 +51,7 @@ class Music_Dir_on_Local_Disk:
 	def set_search_status_as_checked_for_dir(self, certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
 
-	def next_level_dirs_checked_within_one_certain_dir(self, certain_abs_dir_path, dir_level: int):
+	def next_level_dirs_checked_within_one_certain_dir(self, certain_abs_dir_path):
 		if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Checked':
 			return True
 		else:
