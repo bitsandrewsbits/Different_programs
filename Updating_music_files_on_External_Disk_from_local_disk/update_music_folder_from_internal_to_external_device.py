@@ -23,7 +23,7 @@ class Music_Dir_on_Local_Disk:
 		self.dirs_by_levels_and_checked_status = {}  # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
-		self.dir_level_number_for_search = 0
+		self.search_dir_level = 0
 		self.excluded_dirnames_for_search = ['SOFT']  # list can be extended
 
 	def get_operation_system_type(self):
@@ -49,6 +49,12 @@ class Music_Dir_on_Local_Disk:
 	def add_search_abs_dir_path_with_dir_level_and_unchecked_status(self, 
 	certain_abs_dir_path, dir_level):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [dir_level, 'Unchecked']
+
+	def increase_search_dir_level_by_one(self):
+		self.search_dir_level += 1
+
+	def decrease_search_dir_level_by_one(self):
+		self.search_dir_level -= 1
 
 	def set_search_dir_level_for_dir(self, certain_abs_dir_path, dir_level: int):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
