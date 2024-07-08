@@ -45,36 +45,37 @@ class Music_Dir_on_Local_Disk:
 		while not self.filesystem_tree_for_certain_dir_entire_checked():
 
 
-	def add_all_next_level_abs_dirs_pathes_with_dir_level_and_unchecked_status(self, certain_abs_dir_path):
-		self.increase_search_dir_level_by_one()
+	def add_all_next_level_abs_dirs_pathes_with_dir_level_and_unchecked_status(certain_abs_dir_path):
+		increase_search_dir_level_by_one()
 		next_abs_dir_pathes_for_searching = self.get_only_directories_in_dir(certain_abs_dir_path)
 
 		for next_abs_dir_path in next_abs_dir_pathes_for_searching:
 			self.add_search_abs_dir_path_with_dir_level_and_unchecked_status(
 				next_abs_dir_path, self.search_dir_level)
 
-
 	def add_search_abs_dir_path_with_dir_level_and_unchecked_status(self, 
 	certain_abs_dir_path, dir_level):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [dir_level, 'Unchecked']
 
-	def increase_search_dir_level_by_one(self):
+	def increase_search_dir_level_by_one():
 		self.search_dir_level += 1
 
-	def decrease_search_dir_level_by_one(self):
+	def decrease_search_dir_level_by_one():
 		self.search_dir_level -= 1
 
-	def set_search_dir_level_for_dir(self, certain_abs_dir_path, dir_level: int):
+	def set_search_dir_level_for_dir(certain_abs_dir_path, dir_level: int):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
 
-	def set_search_status_as_checked_for_dir(self, certain_abs_dir_path):
+	def set_search_status_as_checked_for_dir(certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
 
-	def next_level_dirs_checked_within_one_certain_dir(self, certain_abs_dir_path):
-		if self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] == 'Checked':
-			return True
+	def all_next_level_dirs_checked_within_one_certain_dir(certain_abs_dir_path):
+		all_next_level_dirs = self.get_only_directories_in_dir(certain_abs_dir_path)
+		for next_leve_abs_dir_path in all_next_level_dirs:
+			if self.dirs_by_levels_and_checked_status[next_leve_abs_dir_path][1] != 'Checked':
+				return False
 		else:
-			return False
+			return True
 
 	def filesystem_tree_for_certain_dir_entire_checked(self):
 		for abs_dir_path in self.dirs_by_levels_and_checked_status:
