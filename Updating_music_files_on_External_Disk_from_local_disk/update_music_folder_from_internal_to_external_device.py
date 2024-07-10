@@ -53,8 +53,13 @@ class Music_Dir_on_Local_Disk:
 			self.add_search_abs_dir_path_with_dir_level_and_unchecked_status(
 				next_abs_dir_path, self.search_dir_level)
 
-	def add_search_abs_dir_path_with_dir_level_and_unchecked_status(self, 
-	certain_abs_dir_path, dir_level):
+
+	def switch_from_checked_dir_tree_to_unchecked_on_same_level(parent_abs_dir_path):
+		all_next_level_dirs = self.get_only_directories_in_dir(parent_abs_dir_path)
+		
+
+
+	def add_search_abs_dir_path_with_dir_level_and_unchecked_status(certain_abs_dir_path, dir_level):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [dir_level, 'Unchecked']
 
 	def increase_search_dir_level_by_one():
