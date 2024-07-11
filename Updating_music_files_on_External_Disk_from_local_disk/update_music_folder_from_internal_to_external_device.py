@@ -25,6 +25,7 @@ class Music_Dir_on_Local_Disk:
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
 		self.search_dir_level = 0
 		self.excluded_dirnames_for_search = ['SOFT']  # list can be extended
+		self.current_search_dir = ''
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -56,8 +57,10 @@ class Music_Dir_on_Local_Disk:
 
 	def switch_from_checked_dir_tree_to_unchecked_on_same_level(parent_abs_dir_path):
 		all_next_level_dirs = self.get_only_directories_in_dir(parent_abs_dir_path)
-		
 
+		for next_level_dir in all_next_level_dirs:
+			if self.dirs_by_levels_and_checked_status[next_level_dir][1] == 'Unchecked':
+				self.current_search_dir = next_level_dir
 
 	def add_search_abs_dir_path_with_dir_level_and_unchecked_status(certain_abs_dir_path, dir_level):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [dir_level, 'Unchecked']
