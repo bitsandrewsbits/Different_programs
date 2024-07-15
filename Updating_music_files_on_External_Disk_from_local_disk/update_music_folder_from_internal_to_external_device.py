@@ -46,8 +46,12 @@ class Music_Dir_on_Local_Disk:
 		while not filesystem_tree_for_certain_dir_entire_checked():
 			if directories_exists_in_dir(self.current_search_abs_dir_path):
 				add_all_next_level_abs_dirs_pathes_for_next_searching(self.current_search_abs_dir_path)
+				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
 
+				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 
+				if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
+					pass
 
 
 
@@ -59,12 +63,10 @@ class Music_Dir_on_Local_Disk:
 			add_abs_dir_path_for_next_searching(next_abs_dir_path)
 
 
-	def switch_from_checked_dir_tree_to_unchecked_on_same_level(parent_abs_dir_path):
-		all_next_level_dirs = self.get_only_directories_in_dir(parent_abs_dir_path)
-
-		for next_level_dir in all_next_level_dirs:
-			if self.dirs_by_levels_and_checked_status[next_level_dir][1] == 'Unchecked':
-				self.current_search_abs_dir_path = next_level_dir
+	def switch_from_checked_dir_tree_to_unchecked_on_same_level(abs_dir_pathes: list):
+		for abs_dir_path in abs_dir_pathes:
+			if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
+				self.current_search_abs_dir_path = abs_dir_path
 				break
 
 	def add_abs_dir_path_for_next_searching(certain_abs_dir_path):
@@ -83,10 +85,11 @@ class Music_Dir_on_Local_Disk:
 	def set_search_status_as_checked_for_dir(certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
 
-	def all_next_level_dirs_checked_within_one_certain_dir(certain_abs_dir_path):
-		all_next_level_dirs = self.get_only_directories_in_dir(certain_abs_dir_path)
-		for next_leve_abs_dir_path in all_next_level_dirs:
-			if self.dirs_by_levels_and_checked_status[next_leve_abs_dir_path][1] != 'Checked':
+	def all_dirs_on_current_level_checked_within_one_certain_dir(abs_dir_pathes: list):
+		# all_next_level_dirs = self.get_only_directories_in_dir(certain_abs_dir_path)
+
+		for abs_dir_path in abs_dir_pathes:
+			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] != 'Checked':
 				return False
 		else:
 			return True
