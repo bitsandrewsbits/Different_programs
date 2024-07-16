@@ -26,6 +26,8 @@ class Music_Dir_on_Local_Disk:
 		self.current_search_dir_level = 0
 		self.excluded_dirnames_for_search = ['SOFT']  # list can be extended
 		self.current_search_abs_dir_path = ''
+		self.search_to_bottom = True
+		self.search_to_up = False
 
 	def get_operation_system_type(self):
 		# print('OS type:', self.operation_system_type)
@@ -44,14 +46,26 @@ class Music_Dir_on_Local_Disk:
 		self.dirs_by_levels_and_checked_status[root_abs_dir_path] = [0, 'Unchecked']    # start point for searching
 
 		while not filesystem_tree_for_certain_dir_entire_checked():
-			if directories_exists_in_dir(self.current_search_abs_dir_path):
+			if directories_exists_in_dir(self.current_search_abs_dir_path) and self.search_to_bottom:
+
+				set_search_status_as_checked_for_dir()
+
+				increase_search_dir_level_by_one()
+				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
+
 				add_all_next_level_abs_dirs_pathes_for_next_searching(self.current_search_abs_dir_path)
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
 
-				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 
-				if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
-					pass
+			else:
+				self.search_to_bottom = False
+				self.search_to_up = True
+				decrease_search_dir_level_by_one()
+
+			# need to think how to do second step - check to up gradually.
+			
+			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
+				pass
 
 
 
