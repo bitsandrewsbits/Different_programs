@@ -63,10 +63,25 @@ class Music_Dir_on_Local_Disk:
 				decrease_search_dir_level_by_one()
 
 			# need to think how to do second step - check to up gradually.
+			if self.search_to_up:
+				switch_from_checked_dir_tree_to_unchecked_on_same_level()
 			
 			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				pass
 
+
+	def get_all_dirs_on_same_level_with_dir(certain_abs_dir_path: str):
+		# function for getting other dirs on the same level with input dir
+		# they all have one parent dir.
+
+	def get_parent_dir_for_child_dir(certain_abs_dir_path):
+		parent_abs_dir_path = ''
+		certain_abs_dir_path = list(certain_abs_dir_path)
+		for i in range(len(certain_abs_dir_path), 0, -1):
+			if certain_abs_dir_path[i] == '/':
+				return parent_abs_dir_path
+			else:
+				certain_abs_dir_path.pop(-1)
 
 
 	def add_all_next_level_abs_dirs_pathes_for_next_searching(certain_abs_dir_path):
