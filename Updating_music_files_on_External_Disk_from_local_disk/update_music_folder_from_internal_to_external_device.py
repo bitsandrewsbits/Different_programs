@@ -62,17 +62,33 @@ class Music_Dir_on_Local_Disk:
 				self.search_to_up = True
 				decrease_search_dir_level_by_one()
 
-			# need to think how to do second step - check to up gradually.
+			# need to do second step - check to up gradually.
 			if self.search_to_up:
-				switch_from_checked_dir_tree_to_unchecked_on_same_level()
+				current_abs_dir_pathes_for_checking = get_all_dirs_on_same_level_within_one_dir(
+					self.current_search_abs_dir_path
+				)
+
+				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_abs_dir_pathes_for_checking)
+
+				# need to test.
 			
 			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				pass
 
 
-	def get_all_dirs_on_same_level_with_dir(certain_abs_dir_path: str):
+	def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
 		# function for getting other dirs on the same level with input dir
 		# they all have one parent dir.
+		parent_abs_dir_path = get_parent_dir_for_child_dir(certain_abs_dir_path)
+		next_level_dirs = get_only_directories_in_dir(parent_abs_dir_path)
+
+		other_next_level_dirs = []
+
+		for abs_dir_path in next_level_dirs:
+			if certain_abs_dir_path != certain_abs_dir_path:
+				other_next_level_dirs.append(abs_dir_path)
+
+		return other_next_level_dirs
 
 	def get_parent_dir_for_child_dir(certain_abs_dir_path):
 		parent_abs_dir_path = ''
