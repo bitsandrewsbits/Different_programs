@@ -55,8 +55,6 @@ class Music_Dir_on_Local_Disk:
 
 				add_all_next_level_abs_dirs_pathes_for_next_searching(self.current_search_abs_dir_path)
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
-
-
 			else:
 				self.search_to_bottom = False
 				self.search_to_up = True
@@ -69,11 +67,15 @@ class Music_Dir_on_Local_Disk:
 				)
 
 				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_abs_dir_pathes_for_checking)
+				
+				self.search_to_up = False
+				self.search_to_bottom = True
 
 				# need to test.
 			
 			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
-				pass
+				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
+				# TODO: finish this function.
 
 
 	def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
@@ -112,7 +114,6 @@ class Music_Dir_on_Local_Disk:
 		for abs_dir_path in abs_dir_pathes:
 			if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
 				self.current_search_abs_dir_path = abs_dir_path
-				break
 
 	def add_abs_dir_path_for_next_searching(certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [self.current_search_dir_level,
@@ -131,8 +132,6 @@ class Music_Dir_on_Local_Disk:
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
 
 	def all_dirs_on_current_level_checked_within_one_certain_dir(abs_dir_pathes: list):
-		# all_next_level_dirs = self.get_only_directories_in_dir(certain_abs_dir_path)
-
 		for abs_dir_path in abs_dir_pathes:
 			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] != 'Checked':
 				return False
