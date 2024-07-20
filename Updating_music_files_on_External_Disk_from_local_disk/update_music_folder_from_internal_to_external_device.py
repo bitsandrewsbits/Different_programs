@@ -75,7 +75,8 @@ class Music_Dir_on_Local_Disk:
 			
 			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
-				# TODO: finish this function.
+				# maybe need to up one more level - parent of parent dir.
+				self.current_search_abs_dir_path = parent_abs_dir_path
 
 
 	def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
