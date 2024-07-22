@@ -38,10 +38,29 @@ class Music_Dir_on_Local_Disk:
 			print('Root dir for partition:', disk_partition.mountpoint)
 			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
 
+	def get_target_system_path_for_searching_music_folder(self):
+		if self.get_operation_system_type() == 'Linux':
+			self.target_system_path = '/media/'
+			self.target_system_path += self.current_login_user
+
+		print('Target dir for searching:', self.target_system_path)
+		return self.target_system_path
+
+	def define_log_in_user_to_Linux_system(self):
+		return os.getlogin()
+
+	def get_log_in_user_to_Linux_system(self):
+		print('current login user:', self.current_login_user)
+		return self.current_login_user
+	
+	# def define_music_folder_on_local_disk(self):
+		# if self.get_operation_system_type() == 'Linux':
+		# 	self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
+	
 	# def find_directory_with_majority_MP3_files(self):
 		# this method - algorithm of finding music directory
 
-	# search algorithm - search in depth
+	# search algorithm - search in depth + in width(combination)
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[root_abs_dir_path] = [0, 'Unchecked']    # start point for searching
 
@@ -78,213 +97,174 @@ class Music_Dir_on_Local_Disk:
 			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
 				# maybe need to up one more level - parent of parent dir.
-				self.current_search_abs_dir_path = parent_abs_dir_path
+				self.current_search_abs_dir_path = get_parent_dir_for_child_dir(parent_abs_dir_path)
+
+			print(f'[INFO] Current search dir path: {self.current_search_abs_dir_path}')
 
 
-	def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
-		# function for getting other dirs on the same level with input dir
-		# they all have one parent dir.
-		parent_abs_dir_path = get_parent_dir_for_child_dir(certain_abs_dir_path)
-		next_level_dirs = get_only_directories_in_dir(parent_abs_dir_path)
 
-		other_next_level_dirs = []
+def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
+	# function for getting other dirs on the same level with input dir
+	# they all have one parent dir.
+	parent_abs_dir_path = get_parent_dir_for_child_dir(certain_abs_dir_path)
+	next_level_dirs = get_only_directories_in_dir(parent_abs_dir_path)
 
-		for abs_dir_path in next_level_dirs:
-			if certain_abs_dir_path != certain_abs_dir_path:
-				other_next_level_dirs.append(abs_dir_path)
+	other_next_level_dirs = []
 
-		return other_next_level_dirs
+	for abs_dir_path in next_level_dirs:
+		if certain_abs_dir_path != certain_abs_dir_path:
+			other_next_level_dirs.append(abs_dir_path)
 
-	def get_parent_dir_for_child_dir(certain_abs_dir_path):
-		parent_abs_dir_path = ''
-		certain_abs_dir_path = list(certain_abs_dir_path)
-		for i in range(len(certain_abs_dir_path), 0, -1):
-			if certain_abs_dir_path[i] == '/':
-				return parent_abs_dir_path
-			else:
-				certain_abs_dir_path.pop(-1)
+	return other_next_level_dirs
 
-
-	def add_all_next_level_abs_dirs_pathes_for_next_searching(abs_dir_pathes):
-		for next_abs_dir_path in abs_dir_pathes:
-			add_abs_dir_path_for_next_searching(next_abs_dir_path)
-
-	def switch_from_checked_dir_tree_to_unchecked_on_same_level(abs_dir_pathes: list):
-		for abs_dir_path in abs_dir_pathes:
-			if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
-				self.current_search_abs_dir_path = abs_dir_path
-				break
-
-	def add_abs_dir_path_for_next_searching(certain_abs_dir_path):
-		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [self.current_search_dir_level,
-		 'Unchecked']
-
-	def increase_search_dir_level_by_one():
-		self.current_search_dir_level += 1
-
-	def decrease_search_dir_level_by_one():
-		self.current_search_dir_level -= 1
-
-	def set_search_dir_level_for_dir(certain_abs_dir_path, dir_level: int):
-		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
-
-	def set_search_status_as_checked_for_dir(certain_abs_dir_path):
-		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
-
-	def all_dirs_on_current_level_checked_within_one_certain_dir(abs_dir_pathes: list):
-		for abs_dir_path in abs_dir_pathes:
-			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] != 'Checked':
-				return False
+def get_parent_dir_for_child_dir(certain_abs_dir_path):
+	parent_abs_dir_path = ''
+	certain_abs_dir_path = list(certain_abs_dir_path)
+	for i in range(len(certain_abs_dir_path), 0, -1):
+		if certain_abs_dir_path[i] == '/':
+			return parent_abs_dir_path
 		else:
-			return True
+			certain_abs_dir_path.pop(-1)
 
-	def filesystem_tree_for_certain_dir_entire_checked():
-		for abs_dir_path in self.dirs_by_levels_and_checked_status:
-			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Unchecked':
-				return False
 
+# TODO: need to think which functions - is just function or class method.
+
+def add_all_next_level_abs_dirs_pathes_for_next_searching(abs_dir_pathes):
+	for next_abs_dir_path in abs_dir_pathes:
+		add_abs_dir_path_for_next_searching(next_abs_dir_path)
+
+def switch_from_checked_dir_tree_to_unchecked_on_same_level(abs_dir_pathes: list):
+	for abs_dir_path in abs_dir_pathes:
+		if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
+			self.current_search_abs_dir_path = abs_dir_path
+			break
+
+def add_abs_dir_path_for_next_searching(certain_abs_dir_path):
+	self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [self.current_search_dir_level,
+	 'Unchecked']
+
+def increase_search_dir_level_by_one():
+	self.current_search_dir_level += 1
+
+def decrease_search_dir_level_by_one():
+	self.current_search_dir_level -= 1
+
+def set_search_dir_level_for_dir(certain_abs_dir_path, dir_level: int):
+	self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
+
+def set_search_status_as_checked_for_dir(certain_abs_dir_path):
+	self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
+
+def all_dirs_on_current_level_checked_within_one_certain_dir(abs_dir_pathes: list):
+	for abs_dir_path in abs_dir_pathes:
+		if self.dirs_by_levels_and_checked_status[abs_dir_path][1] != 'Checked':
+			return False
+	else:
 		return True
 
-	# this method level by level dir checking for nonzero MP3 dirs, and set dirname and amount of MP3 files.
-	# def set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(self, root_abs_dir_path):
-	# 	# first step - get dirs list on first level
-	# 	current_level_abs_dirs_pathes = [root_abs_dir_path]
-	# 	next_level_abs_dirs_pathes = ['not empty']
-
-	# 	# executing while in next level dirs is nothing, but files.
-	# 	while next_level_abs_dirs_pathes != []:
-	# 		next_level_abs_dirs_pathes = []
-	# 		print('Current level abs dir pathes:', current_level_abs_dirs_pathes)
-	# 		print('\n\n')
-	# 		for current_level_abs_dir_path in current_level_abs_dirs_pathes:
-	# 			if self.mp3_files_exist_in_dir(current_level_abs_dir_path):
-	# 				self.directories_with_nonzero_amount_of_MP3_files[current_level_abs_dir_path] = \
-	# 				self.get_amount_of_MP3_files_in_dir(current_level_abs_dir_path)
-	# 			if directories_exists_in_dir(current_level_abs_dir_path):
-	# 				next_level_dirnames = self.get_only_directories_in_dir(current_level_abs_dir_path)
-	# 				next_level_dirnames_without_excluded_dirs = self.get_dirs_list_without_excluded_dirs(next_level_dirnames)
-	# 				# print('Next Level dirs:', next_level_dirnames_without_excluded_dirs)
-	# 				next_level_abs_dirs_pathes_from_one_dir = \
-	# 				self.get_abs_dir_pathes_from_one_dir(current_level_abs_dir_path, next_level_dirnames_without_excluded_dirs)
-	# 			next_level_abs_dirs_pathes += next_level_abs_dirs_pathes_from_one_dir
-
-	# 		current_level_abs_dirs_pathes = next_level_abs_dirs_pathes
-
-	# 	print('Result of MP3 nonzero folders:')
-	# 	print(self.directories_with_nonzero_amount_of_MP3_files)
-
-	def get_dirs_list_without_excluded_dirs(self, dirnames):
-		result_dirs = []
-		for dirname in dirnames:
-			if self.dir_is_excluded_from_search(dirname):
-				print('Excluded dir:', dirname)
-			else:
-				result_dirs.append(dirname)
-
-		return result_dirs
-
-	def dir_is_excluded_from_search(self, dirname):
-		if dirname in self.excluded_dirnames_for_search:
-			return True
-		else:
+def filesystem_tree_for_certain_dir_entire_checked():
+	for abs_dir_path in self.dirs_by_levels_and_checked_status:
+		if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Unchecked':
 			return False
 
-	def get_abs_dir_pathes_of_all_next_level_dirs(self, abs_current_level_dirs_pathes):
-		all_next_level_abs_dir_pathes = []
+	return True
 
-		for abs_current_level_dir_path in abs_current_level_dirs_pathes:
-			dirnames_in_dir = self.get_only_directories_in_dir(abs_current_level_dir_path)
-			next_level_abs_dir_pathes_in_current_level_dir = \
-			self.get_abs_dir_pathes_from_one_dir(abs_current_level_dir_path, dirnames_in_dir)
-			all_next_level_abs_dir_pathes.append(next_level_abs_dir_pathes_in_current_level_dir)
+def get_dirs_list_without_excluded_dirs(dirnames):
+	result_dirs = []
+	for dirname in dirnames:
+		if self.dir_is_excluded_from_search(dirname):
+			print('Excluded dir:', dirname)
+		else:
+			result_dirs.append(dirname)
 
-		return all_next_level_abs_dir_pathes
+	return result_dirs
 
-	def get_abs_dir_pathes_from_one_dir(self, target_abs_dir_path, dirnames_in_target_dir):
-		result_abs_pathes_for_target_dir = []
-		for dirname in dirnames_in_target_dir:
-			temp_abs_dir_path = target_abs_dir_path + '/' + dirname
-			result_abs_pathes_for_target_dir.append(temp_abs_dir_path)
-
-		return result_abs_pathes_for_target_dir
-
-	def mp3_files_exist_in_dir(self, certain_abs_dir_path):
-		files_in_dir = self.get_only_files_in_dir(certain_abs_dir_path)
-		for filename in files_in_dir:
-			if filename[-3:] == 'mp3':
-				return True
-
+def dir_is_excluded_from_search(dirname):
+	if dirname in self.excluded_dirnames_for_search:
+		return True
+	else:
 		return False
 
-	def directories_exists_in_dir(certain_abs_dir_path):
-		dirnames = self.get_only_directories_in_dir(certain_abs_dir_path)
+def get_abs_dir_pathes_of_all_next_level_dirs(abs_current_level_dirs_pathes):
+	all_next_level_abs_dir_pathes = []
 
-		if dirnames != []:
+	for abs_current_level_dir_path in abs_current_level_dirs_pathes:
+		dirnames_in_dir = self.get_only_directories_in_dir(abs_current_level_dir_path)
+		next_level_abs_dir_pathes_in_current_level_dir = \
+		self.get_abs_dir_pathes_from_one_dir(abs_current_level_dir_path, dirnames_in_dir)
+		all_next_level_abs_dir_pathes.append(next_level_abs_dir_pathes_in_current_level_dir)
+
+	return all_next_level_abs_dir_pathes
+
+def get_abs_dir_pathes_from_one_dir(target_abs_dir_path, dirnames_in_target_dir):
+	result_abs_pathes_for_target_dir = []
+	for dirname in dirnames_in_target_dir:
+		temp_abs_dir_path = target_abs_dir_path + '/' + dirname
+		result_abs_pathes_for_target_dir.append(temp_abs_dir_path)
+
+	return result_abs_pathes_for_target_dir
+
+def mp3_files_exist_in_dir(certain_abs_dir_path):
+	files_in_dir = self.get_only_files_in_dir(certain_abs_dir_path)
+	for filename in files_in_dir:
+		if filename[-3:] == 'mp3':
 			return True
-		else:
-			return False
 
-	def get_amount_of_MP3_files_in_dir(self, certain_abs_dir_path):
-		files_in_dir = self.get_only_files_in_dir(certain_abs_dir_path)
-		amount_of_MP3_files_in_dir = 0
+	return False
 
-		for file in files_in_dir:
-			if file[-3:] == 'mp3':
-				amount_of_MP3_files_in_dir += 1
+def directories_exists_in_dir(certain_abs_dir_path):
+	dirnames = self.get_only_directories_in_dir(certain_abs_dir_path)
 
-		return amount_of_MP3_files_in_dir
+	if dirnames != []:
+		return True
+	else:
+		return False
 
-	def get_only_files_in_dir(self, certain_abs_dir_path):
-		all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
+def get_amount_of_MP3_files_in_dir(certain_abs_dir_path):
+	files_in_dir = self.get_only_files_in_dir(certain_abs_dir_path)
+	amount_of_MP3_files_in_dir = 0
 
-		only_files_in_dir = []
-		for filename in all_filenames_in_dir:
-			temp_abs_filename_path = certain_abs_dir_path + '/' + filename
-			if not os.path.isdir(temp_abs_filename_path):
-				only_files_in_dir.append(filename)
+	for file in files_in_dir:
+		if file[-3:] == 'mp3':
+			amount_of_MP3_files_in_dir += 1
 
-		return only_files_in_dir
+	return amount_of_MP3_files_in_dir
 
-	def get_only_directories_in_dir(self, certain_abs_dir_path):
-		dirs_in_certain_dir = []
-		all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
-		for filename in all_filenames_in_dir:
-			temp_abs_filename_path = certain_abs_dir_path + '/' + filename
-			if os.path.isdir(temp_abs_filename_path):
-				dirs_in_certain_dir.append(filename)
+def get_only_files_in_dir(certain_abs_dir_path):
+	all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
 
-		return dirs_in_certain_dir
+	only_files_in_dir = []
+	for filename in all_filenames_in_dir:
+		temp_abs_filename_path = certain_abs_dir_path + '/' + filename
+		if not os.path.isdir(temp_abs_filename_path):
+			only_files_in_dir.append(filename)
 
-	def get_target_system_path_for_searching_music_folder(self):
-		if self.get_operation_system_type() == 'Linux':
-			self.target_system_path = '/media/'
-			self.target_system_path += self.current_login_user
+	return only_files_in_dir
 
-		print('Target dir for searching:', self.target_system_path)
-		return self.target_system_path
+def get_only_directories_in_dir(certain_abs_dir_path):
+	dirs_in_certain_dir = []
+	all_filenames_in_dir = self.get_filenames_in_dir(certain_abs_dir_path)
+	for filename in all_filenames_in_dir:
+		temp_abs_filename_path = certain_abs_dir_path + '/' + filename
+		if os.path.isdir(temp_abs_filename_path):
+			dirs_in_certain_dir.append(filename)
 
-	def get_filenames_in_dir(self, abs_path_to_dir):
-		try:
-			return os.listdir(abs_path_to_dir)
-		except Exception as error:
-			return ['error(permission denied)']
+	return dirs_in_certain_dir
 
-	def filename_is_directory(self, filename):
-		if os.path.isdir(filename):
-			return True
-		else:
-			return False
 
-	def define_log_in_user_to_Linux_system(self):
-		return os.getlogin()
+def get_filenames_in_dir(abs_path_to_dir):
+	try:
+		return os.listdir(abs_path_to_dir)
+	except Exception:
+		return ['error(permission denied)']
 
-	def get_log_in_user_to_Linux_system(self):
-		print('current login user:', self.current_login_user)
-		return self.current_login_user
+def filename_is_directory(filename):
+	if os.path.isdir(filename):
+		return True
+	else:
+		return False
 
-	# def define_music_folder_on_local_disk(self):
-		# if self.get_operation_system_type() == 'Linux':
-		# 	self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
+
 
 
 test_obj = Music_Dir_on_Local_Disk()
@@ -297,3 +277,4 @@ target_system_path = test_obj.get_target_system_path_for_searching_music_folder(
 # test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
 # testing search in depth algorithm - (in future commits)
+test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
