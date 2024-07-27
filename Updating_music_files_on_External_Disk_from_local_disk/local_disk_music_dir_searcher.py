@@ -69,19 +69,19 @@ class Local_Disk_Music_Dir_Searcher:
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[root_abs_dir_path] = [0, 'Unchecked']    # start point for searching
 
-		while not filesystem_tree_from_certain_dir_entire_checked(self.target_system_path):
+		while not filesystem_tree_from_certain_dir_entire_checked(self.dirs_by_levels_and_checked_status):
 			if directories_exists_in_dir(self.current_search_abs_dir_path) and self.search_to_bottom:
 
-				set_search_status_as_checked_for_dir()
+				self.set_search_status_as_checked_for_dir()
 
-				increase_search_dir_level_by_one()
+				self.increase_search_dir_level_by_one()
 
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
 				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 
-				add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
+				self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
 			else:
-				set_search_status_as_checked_for_dir()
+				self.set_search_status_as_checked_for_dir()
 				self.search_to_bottom = False
 				self.search_to_up = True
 				decrease_search_dir_level_by_one()
@@ -92,7 +92,7 @@ class Local_Disk_Music_Dir_Searcher:
 					self.current_search_abs_dir_path
 				)
 
-				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_abs_dir_pathes_for_checking)
+				self.switch_from_checked_dir_tree_to_unchecked_on_same_level(current_abs_dir_pathes_for_checking)
 				
 				self.search_to_up = False
 				self.search_to_bottom = True
@@ -107,33 +107,33 @@ class Local_Disk_Music_Dir_Searcher:
 			print(f'[INFO] Current search dir path: {self.current_search_abs_dir_path}')
 
 
-	def add_all_next_level_abs_dirs_pathes_for_next_searching(abs_dir_pathes):
+	def add_all_next_level_abs_dirs_pathes_for_next_searching(self, abs_dir_pathes):
 		for next_abs_dir_path in abs_dir_pathes:
-			add_abs_dir_path_for_next_searching(next_abs_dir_path)
+			self.add_abs_dir_path_for_next_searching(next_abs_dir_path)
 
-	def switch_from_checked_dir_tree_to_unchecked_on_same_level(abs_dir_pathes: list):
+	def switch_from_checked_dir_tree_to_unchecked_on_same_level(self, abs_dir_pathes: list):
 		for abs_dir_path in abs_dir_pathes:
 			if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
 				self.current_search_abs_dir_path = abs_dir_path
 				break
 
-	def add_abs_dir_path_for_next_searching(certain_abs_dir_path):
+	def add_abs_dir_path_for_next_searching(self, certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path] = [self.current_search_dir_level,
 		 'Unchecked']
 
-	def increase_search_dir_level_by_one():
+	def increase_search_dir_level_by_one(self):
 		self.current_search_dir_level += 1
 
-	def decrease_search_dir_level_by_one():
+	def decrease_search_dir_level_by_one(self):
 		self.current_search_dir_level -= 1
 
-	def set_search_dir_level_for_dir(certain_abs_dir_path, dir_level: int):
+	def set_search_dir_level_for_dir(self, certain_abs_dir_path, dir_level: int):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][0] = dir_level
 
-	def set_search_status_as_checked_for_dir(certain_abs_dir_path):
+	def set_search_status_as_checked_for_dir(self, certain_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[certain_abs_dir_path][1] = 'Checked'
 
-	def all_dirs_on_current_level_checked_within_one_certain_dir(abs_dir_pathes: list):
+	def all_dirs_on_current_level_checked_within_one_certain_dir(self, abs_dir_pathes: list):
 		for abs_dir_path in abs_dir_pathes:
 			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] != 'Checked':
 				return False
@@ -141,7 +141,8 @@ class Local_Disk_Music_Dir_Searcher:
 			return True
 
 
-# TODO: need to think which functions - is just function or class method.
+
+# additional functions for class methods.
 
 def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
 	# function for getting other dirs on the same level with input dir
