@@ -35,12 +35,12 @@ class Local_Disk_Music_Dir_Searcher:
 		self.search_to_up = False
 
 	def get_operation_system_type(self):
-		# print('OS type:', self.operation_system_type)
+		print('OS type:', self.operation_system_type)
 		return self.operation_system_type
 
 	def get_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
-			print('Root dir for partition:', disk_partition.mountpoint)
+			# print('Root dir for partition:', disk_partition.mountpoint)
 			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
 
 	def get_target_system_path_for_searching_music_folder(self):
@@ -68,23 +68,24 @@ class Local_Disk_Music_Dir_Searcher:
 	# search algorithm - search in depth + in width(combination)
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
 		self.dirs_by_levels_and_checked_status[root_abs_dir_path] = [0, 'Unchecked']    # start point for searching
+		self.current_search_abs_dir_path = root_abs_dir_path  # maybe for now. [WARNING]
 
 		while not filesystem_tree_from_certain_dir_entire_checked(self.dirs_by_levels_and_checked_status):
 			if directories_exists_in_dir(self.current_search_abs_dir_path) and self.search_to_bottom:
 
-				self.set_search_status_as_checked_for_dir()
+				self.set_search_status_as_checked_for_dir(self.current_search_abs_dir_path)
 
 				self.increase_search_dir_level_by_one()
 
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
-				switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
-
 				self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
+
+				self.switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 			else:
-				self.set_search_status_as_checked_for_dir()
+				self.set_search_status_as_checked_for_dir(self.current_search_abs_dir_path)
 				self.search_to_bottom = False
 				self.search_to_up = True
-				decrease_search_dir_level_by_one()
+				self.decrease_search_dir_level_by_one()
 
 			# need to do second step - check to up gradually.
 			if self.search_to_up:
@@ -99,7 +100,7 @@ class Local_Disk_Music_Dir_Searcher:
 
 				# need to test.
 			
-			if all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
+			if self.all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
 				# maybe need to up one more level - parent of parent dir.
 				self.current_search_abs_dir_path = get_parent_dir_for_child_dir(parent_abs_dir_path)
@@ -113,7 +114,7 @@ class Local_Disk_Music_Dir_Searcher:
 
 	def switch_from_checked_dir_tree_to_unchecked_on_same_level(self, abs_dir_pathes: list):
 		for abs_dir_path in abs_dir_pathes:
-			if self.dirs_by_levels_and_checked_status[abs_dir_pathr][1] == 'Unchecked':
+			if self.dirs_by_levels_and_checked_status[abs_dir_path][1] == 'Unchecked':
 				self.current_search_abs_dir_path = abs_dir_path
 				break
 
@@ -163,6 +164,7 @@ def get_parent_dir_for_child_dir(certain_abs_dir_path):
 	certain_abs_dir_path = list(certain_abs_dir_path)
 	for i in range(len(certain_abs_dir_path), 0, -1):
 		if certain_abs_dir_path[i] == '/':
+			parent_abs_dir_path = certain_abs_dir_path
 			return parent_abs_dir_path
 		else:
 			certain_abs_dir_path.pop(-1)
@@ -258,11 +260,12 @@ def get_filenames_in_dir(abs_path_to_dir):
 
 
 test_obj = Local_Disk_Music_Dir_Searcher()
-# test_obj.get_operation_system_type()
-# test_obj.get_all_partitions_mountpoints_on_local_disk()
+test_obj.get_operation_system_type()
+test_obj.get_all_partitions_mountpoints_on_local_disk()
 test_obj.get_log_in_user_to_Linux_system()
 target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
 # test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
 # testing search in depth algorithm - (in future commits)
+print(target_system_path)
 test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
