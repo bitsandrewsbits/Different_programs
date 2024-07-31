@@ -162,7 +162,7 @@ def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
 def get_parent_dir_for_child_dir(certain_abs_dir_path):
 	parent_abs_dir_path = ''
 	certain_abs_dir_path = list(certain_abs_dir_path)
-	for i in range(len(certain_abs_dir_path), 0, -1):
+	for i in range(len(certain_abs_dir_path) - 1, 0, -1):
 		if certain_abs_dir_path[i] == '/':
 			parent_abs_dir_path = certain_abs_dir_path
 			return parent_abs_dir_path
@@ -242,9 +242,11 @@ def get_only_directories_in_dir(certain_abs_dir_path):
 	dirs_in_certain_dir = []
 	all_filenames_in_dir = get_filenames_in_dir(certain_abs_dir_path)
 	for filename in all_filenames_in_dir:
+		print(certain_abs_dir_path)
+		print(filename)
 		temp_abs_filename_path = certain_abs_dir_path + '/' + filename
 		if os.path.isdir(temp_abs_filename_path):
-			dirs_in_certain_dir.append(filename)
+			dirs_in_certain_dir.append(temp_abs_filename_path)
 
 	return dirs_in_certain_dir
 
@@ -253,7 +255,7 @@ def get_filenames_in_dir(abs_path_to_dir):
 	try:
 		return os.listdir(abs_path_to_dir)
 	except Exception:
-		return ['error(permission denied)']
+		return 'error(permission denied)'
 
 
 
