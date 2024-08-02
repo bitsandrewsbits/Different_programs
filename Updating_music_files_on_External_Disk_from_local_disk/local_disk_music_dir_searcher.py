@@ -79,6 +79,7 @@ class Local_Disk_Music_Dir_Searcher:
 
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
 				self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
+				# print(self.dirs_by_levels_and_checked_status)
 
 				self.switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 			else:
@@ -86,6 +87,7 @@ class Local_Disk_Music_Dir_Searcher:
 				self.search_to_bottom = False
 				self.search_to_up = True
 				self.decrease_search_dir_level_by_one()
+
 
 			# need to do second step - check to up gradually.
 			if self.search_to_up:
@@ -164,11 +166,10 @@ def get_parent_dir_for_child_dir(certain_abs_dir_path):
 	certain_abs_dir_path = list(certain_abs_dir_path)
 	for i in range(len(certain_abs_dir_path) - 1, 0, -1):
 		if certain_abs_dir_path[i] == '/':
-			parent_abs_dir_path = certain_abs_dir_path
+			parent_abs_dir_path = ''.join(certain_abs_dir_path[:-1])    # without last symbol '/'
 			return parent_abs_dir_path
 		else:
 			certain_abs_dir_path.pop(-1)
-
 
 def filesystem_tree_from_certain_dir_entire_checked(dirs_pathes_statuses: dict):
 	for abs_dir_path_status in dirs_pathes_statuses:
@@ -242,8 +243,6 @@ def get_only_directories_in_dir(certain_abs_dir_path):
 	dirs_in_certain_dir = []
 	all_filenames_in_dir = get_filenames_in_dir(certain_abs_dir_path)
 	for filename in all_filenames_in_dir:
-		print(certain_abs_dir_path)
-		print(filename)
 		temp_abs_filename_path = certain_abs_dir_path + '/' + filename
 		if os.path.isdir(temp_abs_filename_path):
 			dirs_in_certain_dir.append(temp_abs_filename_path)
@@ -260,14 +259,15 @@ def get_filenames_in_dir(abs_path_to_dir):
 
 
 
+if __name__ == '__main__':
+	test_obj = Local_Disk_Music_Dir_Searcher()
+	test_obj.get_operation_system_type()
+	test_obj.get_all_partitions_mountpoints_on_local_disk()
+	test_obj.get_log_in_user_to_Linux_system()
+	target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
+	# test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
-test_obj = Local_Disk_Music_Dir_Searcher()
-test_obj.get_operation_system_type()
-test_obj.get_all_partitions_mountpoints_on_local_disk()
-test_obj.get_log_in_user_to_Linux_system()
-target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
-# test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
+	# testing search in depth algorithm - (in future commits)
+	print(target_system_path)
+	test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
 
-# testing search in depth algorithm - (in future commits)
-print(target_system_path)
-test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
