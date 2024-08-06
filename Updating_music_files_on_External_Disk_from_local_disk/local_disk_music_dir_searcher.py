@@ -34,9 +34,8 @@ class Local_Disk_Music_Dir_Searcher:
 		self.search_to_bottom = True
 		self.search_to_up = False
 
-	def get_operation_system_type(self):
+	def show_operation_system_type(self):
 		print('OS type:', self.operation_system_type)
-		return self.operation_system_type
 
 	def find_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
@@ -48,23 +47,27 @@ class Local_Disk_Music_Dir_Searcher:
 			user_input = input('Choose one disk partition for searching \
 				[enter number from left column of list above]:')
 			if user_input.isdigit():
-				pass
+				user_input_number = int(user_input)
+				if user_input_number >= 0 and user_input_number < len(self.disk_partitions_mountpoints):
+					self.target_system_path = self.disk_partitions_mountpoints[user_input_number]
+					break
+				else:
+					print('Input value out of range! Try again.')
+			else:
+				print('Wrong type of input value! Try again.')
 
 	def show_partitions_info_for_user(self):
 		print(f'[INFO] Found {len(self.disk_partitions_mountpoints)} disk partitions.')
 		print('Partitions:')
 		for i in range(len(self.disk_partitions_mountpoints)):
-			print(f'({i + 1}) - {self.disk_partitions_mountpoints[i]}')
+			print(f'({i}) - {self.disk_partitions_mountpoints[i]}')
 
 		print()
 
 	def get_target_system_path_for_searching_music_folder(self):
-		if self.get_operation_system_type() == 'Linux':
-			self.target_system_path = '/media/'
-			self.target_system_path += self.current_login_user
-
-		print('Target dir for searching:', self.target_system_path)
-		return self.target_system_path
+		if self.operation_system_type == 'Linux':
+			print('Target dir for searching:', self.target_system_path)
+			return self.target_system_path
 
 	def define_log_in_user_to_Linux_system(self):
 		return os.getlogin()
@@ -165,7 +168,7 @@ class Local_Disk_Music_Dir_Searcher:
 			return True
 
 
-
+#=========================================
 # additional functions for class methods.
 
 def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
@@ -282,14 +285,15 @@ def get_filenames_in_dir(abs_path_to_dir):
 
 if __name__ == '__main__':
 	test_obj = Local_Disk_Music_Dir_Searcher()
-	test_obj.get_operation_system_type()
+	test_obj.show_operation_system_type()
 	test_obj.find_all_partitions_mountpoints_on_local_disk()
 	test_obj.get_log_in_user_to_Linux_system()
 	test_obj.show_partitions_info_for_user()
+	test_obj.choose_local_disk_partition_for_searching()
 	target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
+	print(target_system_path)
 	# test_obj.set_dir_and_nonzero_amount_of_MP3_files_search_from_target_dir(target_system_path)
 
 	# testing search in depth algorithm
-	print(target_system_path)
 	test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
 
