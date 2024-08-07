@@ -98,7 +98,8 @@ class Local_Disk_Music_Dir_Searcher:
 
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
 				self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
-				# print(self.dirs_by_levels_and_checked_status)
+				print(f'Child dirs for {self.current_search_abs_dir_path}:')
+				print(current_next_abs_dir_pathes)
 
 				self.switch_from_checked_dir_tree_to_unchecked_on_same_level(current_next_abs_dir_pathes)
 			else:
@@ -113,22 +114,24 @@ class Local_Disk_Music_Dir_Searcher:
 				current_abs_dir_pathes_for_checking = get_all_dirs_on_same_level_within_one_dir(
 					self.current_search_abs_dir_path
 				)
+				print(current_abs_dir_pathes_for_checking)
 
 				self.switch_from_checked_dir_tree_to_unchecked_on_same_level(current_abs_dir_pathes_for_checking)
 				
 				self.search_to_up = False
 				self.search_to_bottom = True
 
-				# need to test.
+				# testing in process
 			
 			if self.all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
 				# maybe need to up one more level - parent of parent dir.
 				self.current_search_abs_dir_path = get_parent_dir_for_child_dir(parent_abs_dir_path)
+				print('ALL subdirs was checked! Switching search dir...')
 
 			print(f'[INFO] Current search dir path: {self.current_search_abs_dir_path}')
 			
-			if tmp_counter < 2:
+			if tmp_counter > 5:
 				break
 
 			tmp_counter += 1
@@ -180,7 +183,7 @@ def get_all_dirs_on_same_level_within_one_dir(certain_abs_dir_path: str):
 	other_next_level_dirs = []
 
 	for abs_dir_path in next_level_dirs:
-		if certain_abs_dir_path != certain_abs_dir_path:
+		if abs_dir_path != certain_abs_dir_path:
 			other_next_level_dirs.append(abs_dir_path)
 
 	return other_next_level_dirs
