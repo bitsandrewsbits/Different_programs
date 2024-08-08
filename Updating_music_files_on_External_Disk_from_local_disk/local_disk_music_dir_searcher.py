@@ -97,7 +97,9 @@ class Local_Disk_Music_Dir_Searcher:
 				self.increase_search_dir_level_by_one()
 
 				current_next_abs_dir_pathes = get_only_directories_in_dir(self.current_search_abs_dir_path)
-				self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
+				if self.abs_dir_pathes_not_exist_in_dirs_pathes_dict(current_next_abs_dir_pathes):
+					self.add_all_next_level_abs_dirs_pathes_for_next_searching(current_next_abs_dir_pathes)
+				
 				print(f'Child dirs for {self.current_search_abs_dir_path}:')
 				print(current_next_abs_dir_pathes)
 
@@ -131,7 +133,7 @@ class Local_Disk_Music_Dir_Searcher:
 
 			print(f'[INFO] Current search dir path: {self.current_search_abs_dir_path}')
 			
-			if tmp_counter > 5:
+			if tmp_counter > 15:
 				break
 
 			tmp_counter += 1
@@ -140,6 +142,14 @@ class Local_Disk_Music_Dir_Searcher:
 	def add_all_next_level_abs_dirs_pathes_for_next_searching(self, abs_dir_pathes):
 		for next_abs_dir_path in abs_dir_pathes:
 			self.add_abs_dir_path_for_next_searching(next_abs_dir_path)
+
+	def abs_dir_pathes_not_exist_in_dirs_pathes_dict(self, abs_dir_pathes):
+		all_abs_dir_pathes = self.dirs_by_levels_and_checked_status.keys()
+		for abs_dir_path in abs_dir_pathes:
+			if abs_dir_path in all_abs_dir_pathes:
+				return False
+
+		return True
 
 	def switch_from_checked_dir_tree_to_unchecked_on_same_level(self, abs_dir_pathes: list):
 		for abs_dir_path in abs_dir_pathes:
