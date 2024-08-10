@@ -25,7 +25,7 @@ class Local_Disk_Music_Dir_Searcher:
 	def __init__(self):
 		self.operation_system_type = platform.system()
 		self.disk_partitions_mountpoints = []
-		self.directories_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
+		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
 		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
 		self.target_system_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
@@ -33,6 +33,7 @@ class Local_Disk_Music_Dir_Searcher:
 		self.current_search_abs_dir_path = ''
 		self.search_to_bottom = True
 		self.search_to_up = False
+		self.abs_dir_path_with_biggest_amount_of_MP3_files = 0
 
 	def show_operation_system_type(self):
 		print('OS type:', self.operation_system_type)
@@ -65,8 +66,7 @@ class Local_Disk_Music_Dir_Searcher:
 		print()
 
 	def get_target_system_path_for_searching_music_folder(self):
-		if self.operation_system_type == 'Linux':
-			return self.target_system_path
+		return self.target_system_path
 
 	def define_log_in_user_to_Linux_system(self):
 		return os.getlogin()
@@ -78,8 +78,15 @@ class Local_Disk_Music_Dir_Searcher:
 		# if self.get_operation_system_type() == 'Linux':
 		# 	self.get_not_empty_directories_with_MP3_files() # it will develop in future commits
 	
-	# def find_directory_with_majority_MP3_files(self):
-		# this method - algorithm of finding music directory
+	def define_dir_with_biggest_amount_of_MP3_files(self):
+		for abs_dir_path in self.dirs_with_nonzero_amount_of_MP3_files:
+			current_amount_of_MP3_files = self.dirs_with_nonzero_amount_of_MP3_files[abs_dir_path]
+			if self.abs_dir_path_with_biggest_amount_of_MP3_files < current_amount_of_MP3_files:
+				self.abs_dir_path_with_biggest_amount_of_MP3_files = current_amount_of_MP3_files
+
+	# TODO: create method for displaying abs dir path with biggest amount of MP3 files
+	def show_dir_with_biggest_amount_of_MP3_files(self):
+		pass
 
 	# search algorithm - search in depth + in width(combination)
 	def search_nonzero_MP3_dirs_in_partition_filesystem(self, root_abs_dir_path):
@@ -131,7 +138,7 @@ class Local_Disk_Music_Dir_Searcher:
 			print(f'[INFO] Current search dir path: {self.current_search_abs_dir_path}')
 			
 			if mp3_files_exist_in_dir(self.current_search_abs_dir_path):
-				self.directories_with_nonzero_amount_of_MP3_files[self.current_search_abs_dir_path] = \
+				self.dirs_with_nonzero_amount_of_MP3_files[self.current_search_abs_dir_path] = \
 				get_amount_of_MP3_files_in_dir(self.current_search_abs_dir_path)
 			
 			# if tmp_counter > 15:
@@ -180,8 +187,8 @@ class Local_Disk_Music_Dir_Searcher:
 			return True
 
 	def show_search_nonzero_MP3_dirs_result(self):
-		for abs_mp3_dir_path in self.directories_with_nonzero_amount_of_MP3_files:
-			number_of_MP3_files_in_dir = self.directories_with_nonzero_amount_of_MP3_files[abs_mp3_dir_path]
+		for abs_mp3_dir_path in self.dirs_with_nonzero_amount_of_MP3_files:
+			number_of_MP3_files_in_dir = self.dirs_with_nonzero_amount_of_MP3_files[abs_mp3_dir_path]
 			print(f'{abs_mp3_dir_path}: {number_of_MP3_files_in_dir} file/s')
 		print()
 
@@ -318,4 +325,5 @@ if __name__ == '__main__':
 	print('\n[INFO] Searching process - finished!')
 	print(f'Found nonzero-MP3 dirs in local disk partition - {test_obj.target_system_path}:')
 	test_obj.show_search_nonzero_MP3_dirs_result()
+	test_obj.define_dir_with_biggest_amount_of_MP3_files()
 
