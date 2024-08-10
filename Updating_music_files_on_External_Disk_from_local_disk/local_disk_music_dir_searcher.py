@@ -66,14 +66,12 @@ class Local_Disk_Music_Dir_Searcher:
 
 	def get_target_system_path_for_searching_music_folder(self):
 		if self.operation_system_type == 'Linux':
-			print('Target dir for searching:', self.target_system_path)
 			return self.target_system_path
 
 	def define_log_in_user_to_Linux_system(self):
 		return os.getlogin()
 
 	def get_log_in_user_to_Linux_system(self):
-		print('current login user:', self.current_login_user)
 		return self.current_login_user
 	
 	# def define_music_folder_on_local_disk(self):
@@ -127,7 +125,6 @@ class Local_Disk_Music_Dir_Searcher:
 			
 			if self.all_dirs_on_current_level_checked_within_one_certain_dir(current_next_abs_dir_pathes):
 				parent_abs_dir_path = get_parent_dir_for_child_dir(current_next_abs_dir_pathes[0])
-				# maybe need to up one more level - parent of parent dir.
 				self.current_search_abs_dir_path = get_parent_dir_for_child_dir(parent_abs_dir_path)
 				print('ALL subdirs was checked! Switching search dir...')
 
@@ -139,9 +136,7 @@ class Local_Disk_Music_Dir_Searcher:
 			
 			# if tmp_counter > 15:
 			# 	break
-
 			# tmp_counter += 1
-
 
 	def add_all_next_level_abs_dirs_pathes_for_next_searching(self, abs_dir_pathes):
 		for next_abs_dir_path in abs_dir_pathes:
@@ -183,6 +178,12 @@ class Local_Disk_Music_Dir_Searcher:
 				return False
 		else:
 			return True
+
+	def show_search_nonzero_MP3_dirs_result(self):
+		for abs_mp3_dir_path in self.directories_with_nonzero_amount_of_MP3_files:
+			number_of_MP3_files_in_dir = self.directories_with_nonzero_amount_of_MP3_files[abs_mp3_dir_path]
+			print(f'{abs_mp3_dir_path}: {number_of_MP3_files_in_dir} file/s')
+		print()
 
 
 #=========================================
@@ -310,10 +311,11 @@ if __name__ == '__main__':
 	target_system_path = test_obj.get_target_system_path_for_searching_music_folder()
 	print(target_system_path)
 
-	# testing search in depth algorithm
+	# search in depth algorithm 
 	test_obj.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
 
+	# result
 	print('\n[INFO] Searching process - finished!')
-	print(f'Found nonzero-MP3 dirs in disk partition - {test_obj.target_system_path}:')
-	print(f'{test_obj.directories_with_nonzero_amount_of_MP3_files}')
+	print(f'Found nonzero-MP3 dirs in local disk partition - {test_obj.target_system_path}:')
+	test_obj.show_search_nonzero_MP3_dirs_result()
 
