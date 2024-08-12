@@ -6,5 +6,5 @@ class External_Device_Searcher:
 	def __init__(self):
 		pass
 
-	def external_devices_connected(self):
-		pass
+	def external_device_connected_to_computer(self):
+		# question: how exactly to determine which mounted partitions to computer - is external USB hard disk, USB-flash partitions?
