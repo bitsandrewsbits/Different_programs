@@ -40,6 +40,27 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 		return found_target_strs
 
+	def get_USB_dev_number_from_target_strs(self, target_strs: str):
+		USB_dev_number = ''
+		regex_obj = re.compile('.*usb-storage [1-9]-[1-9][.:][1-9 ].*')
+		str_with_USB_number = ''
+		for string in target_strs:
+			if regex_obj.match(string):
+				str_with_USB_number = string
+				print('Found target USB number in string:', string)
+				break
+
+		str_elements = str_with_USB_number.split(' ')
+		regex_obj = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
+		for elem in str_elements:
+			if regex_obj.match(elem):
+				USB_dev_number = elem
+
+		found_USB_dev_number = USB_dev_number.split(':')[0]
+		print('Found connected USB dev with number:', found_USB_dev_number)
+
+		return found_USB_dev_number
+
 		# 4) Create strings - 
 		#	1)usb-<detected_words_from_(3)> Product: 
 		#	2)usb-<detected_words_from_(3)> Manufacturer:
@@ -59,3 +80,4 @@ if __name__ == "__main__":
 	usb_storage_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
 	target_usb_storage_strs = external_usb_dev_seacher.get_target_strings_from_file_strs(usb_storage_strs, 'usb-storage')
 	print(target_usb_storage_strs)
+	external_usb_dev_seacher.get_USB_dev_number_from_target_strs(target_usb_storage_strs)
