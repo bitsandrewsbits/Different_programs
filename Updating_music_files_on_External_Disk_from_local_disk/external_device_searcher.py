@@ -64,9 +64,15 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 		return clean_USB_dev_numbers
 
-		# 4) Create strings - 
-		#	1)usb-<detected_words_from_(3)> Product: 
-		#	2)usb-<detected_words_from_(3)> Manufacturer:
+	# 4) Create strings - 
+	#	1)usb-<detected_words_from_(3)> Product:
+	def get_USB_Product_string_as_regex(self, usb_number_str: str):
+		return f"usb-{usb_number_str} Product:"
+	
+	#	2)usb-<detected_words_from_(3)> Manufacturer:
+	def get_USB_Manufacturer_string_as_regex(self, usb_number_str: str):
+		return f"usb-{usb_number_str} Manufacturer:"
+		
 		# 5) Parse created file from (1) - detect string from (4). Write them to separate file.
 		# 6) Parse created file from (5) - detect Product and Manufacturer values and save it to list or dict.
 		# 7) If list or dict from (6) - is empty -> method returns False
