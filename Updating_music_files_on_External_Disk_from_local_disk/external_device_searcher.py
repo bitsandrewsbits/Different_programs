@@ -40,6 +40,15 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 		return found_target_strs
 
+	def get_connected_USB_storage_devs_regex_strs(self, target_strs: list[str]):
+		connected_USB_storage_dev_nums = self.get_connected_USB_dev_numbers_from_target_strs(target_strs)
+		connected_USB_storage_devs_regex_strs = []
+
+		for usb_storage_num in connected_USB_storage_dev_nums:
+			connected_USB_storage_devs_regex_strs.append(f'.*usb {usb_storage_num}.*')
+
+		return connected_USB_storage_devs_regex_strs
+
 	def get_connected_USB_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		connected_USB_dev_numbers = []
 		regex_obj = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
@@ -66,14 +75,17 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 	# 4) Create strings - 
 	#	1)usb-<detected_words_from_(3)> Product:
-	def get_USB_Product_string_as_regex(self, usb_number_str: str):
-		return f"usb-{usb_number_str} Product:"
+	def get_USB_storage_Product_regex_string(self, usb_number_str: str):
+		return f".*usb-{usb_number_str} Product:"
 	
 	#	2)usb-<detected_words_from_(3)> Manufacturer:
-	def get_USB_Manufacturer_string_as_regex(self, usb_number_str: str):
+	def get_USB_storage_Manufacturer_regex_string(self, usb_number_str: str):
 		return f"usb-{usb_number_str} Manufacturer:"
 		
 		# 5) Parse created file from (1) - detect string from (4). Write them to separate file.
+	def get_USB_storage_devs_Product_values(self):
+		pass
+
 		# 6) Parse created file from (5) - detect Product and Manufacturer values and save it to list or dict.
 		# 7) If list or dict from (6) - is empty -> method returns False
 		#    If list or dict from (6) - not empty -> method returns True
@@ -87,6 +99,8 @@ if __name__ == "__main__":
 	external_usb_dev_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
 	usb_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
 	usb_storage_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
+
 	target_usb_storage_strs = external_usb_dev_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
-	print(target_usb_storage_strs)
-	external_usb_dev_seacher.get_connected_USB_dev_numbers_from_target_strs(target_usb_storage_strs)
+	
+	connected_USB_storage_devs_regex_strs = external_usb_dev_seacher.get_connected_USB_storage_devs_regex_strs(target_usb_storage_strs)
+	print(connected_USB_storage_devs_regex_strs)
