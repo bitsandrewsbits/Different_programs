@@ -4,11 +4,14 @@
 import os
 import re
 
-class External_Connected_USB_Disk_Devices_Searcher:
+# experimental variant to resolve this task(first for Linux systems):
+class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
-		pass
+		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
+		self.connected_usb_storages_number_strs = []
+		self.connected_usb_storages_full_name_regex_strs = []
+		self.connected_usb_storage_devs_Manufacturer_Product_regex_strs = [] # data structure - [{'Manufacturer': '', 'Product': ''}, {},..]
 
-	# experimental variant to resolve this task(first for Linux systems):
 	def external_USB_devices_connected_to_computer(self):
 		pass
 	
@@ -28,7 +31,6 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 		return result_file_strs
 
-	# 3) Parse created file from (2) - detect words "1-1.2:" or something like that and save it in python list or dict
 	def get_target_strings_from_strs(self, strings: list[str], regex_str: str):
 		found_target_strs = []
 		regex_obj = re.compile(regex_str)
@@ -40,23 +42,22 @@ class External_Connected_USB_Disk_Devices_Searcher:
 
 		return found_target_strs
 
-	def get_connected_USB_storage_devs_regex_strs(self, target_strs: list[str]):
+	def create_connected_USB_storage_devs_regex_strs(self, target_strs: list[str]):
 		connected_USB_storage_dev_nums = self.get_connected_USB_dev_numbers_from_target_strs(target_strs)
-		connected_USB_storage_devs_regex_strs = []
 
 		for usb_storage_num in connected_USB_storage_dev_nums:
-			connected_USB_storage_devs_regex_strs.append(f'.*usb {usb_storage_num}.*')
+			self.connected_usb_storages_number_strs.append(f'.*usb {usb_storage_num}.*')
 
-		return connected_USB_storage_devs_regex_strs
+		print(self.connected_usb_storages_number_strs)
+		return True
 
 	def get_connected_USB_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		connected_USB_dev_numbers = []
-		regex_obj = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
 
 		for str_with_USB_number in target_strs:
 			str_elements = str_with_USB_number.split(' ')
 			for elem in str_elements:
-				if regex_obj.match(elem):
+				if self.usb_number_regex_for_dmesg_txt.match(elem):
 					USB_dev_number = elem
 					connected_USB_dev_numbers.append(USB_dev_number)
 					break
@@ -83,7 +84,7 @@ class External_Connected_USB_Disk_Devices_Searcher:
 		return f"usb-{usb_number_str} Manufacturer:"
 		
 		# 5) Parse created file from (1) - detect string from (4). Write them to separate file.
-	def get_USB_storage_devs_Product_values(self):
+	def get_USB_storage_devs_Manufacturer_Product(self, target_strs: list[str]):
 		pass
 
 		# 6) Parse created file from (5) - detect Product and Manufacturer values and save it to list or dict.
@@ -94,7 +95,7 @@ class External_Connected_USB_Disk_Devices_Searcher:
 		# N) Find from output (1) - detect words - sdb, sdc,... - as block devices, mounted to your Linux system.
 
 if __name__ == "__main__":
-	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Searcher()
+	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Linux_Searcher()
 	external_usb_dev_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
 	external_usb_dev_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
 	usb_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
@@ -102,5 +103,4 @@ if __name__ == "__main__":
 
 	target_usb_storage_strs = external_usb_dev_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
 	
-	connected_USB_storage_devs_regex_strs = external_usb_dev_seacher.get_connected_USB_storage_devs_regex_strs(target_usb_storage_strs)
-	print(connected_USB_storage_devs_regex_strs)
+	external_usb_dev_seacher.create_connected_USB_storage_devs_regex_strs(target_usb_storage_strs)
