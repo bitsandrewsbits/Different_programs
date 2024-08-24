@@ -8,9 +8,10 @@ import re
 class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
-		self.connected_usb_storages_number_strs = []
+		self.connected_usb_storages_number_strs = {}
 		self.connected_usb_storages_full_name_regex_strs = []
-		self.connected_usb_storage_devs_Manufacturer_Product_regex_strs = [] # data structure - [{'Manufacturer': '', 'Product': ''}, {},..]
+		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Manufacturer_regex_obj, usb-dev_Product_regex_obj], [...]]
+		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Manufacturer': '', 'Product': ''}, {},..]
 
 	def external_USB_devices_connected_to_computer(self):
 		pass
@@ -42,16 +43,19 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		return found_target_strs
 
-	def create_connected_USB_storage_devs_regex_strs(self, target_strs: list[str]):
-		connected_USB_storage_dev_nums = self.get_connected_USB_dev_numbers_from_target_strs(target_strs)
+	def create_connected_USB_storage_Manufacturer_Product_regex_strs(self):
+		for usb_storage_num_str in self.connected_usb_storages_number_strs:
+			dev_Manufacturer_regex = re.compile(self.get_USB_storage_Manufacturer_regex_string(usb_storage_num_str))
+			dev_Product_regex = re.compile(self.get_USB_storage_Product_regex_string(usb_storage_num_str))
+			self.connected_usb_storage_devs_Manufacturer_Product_regex.append(
+				[dev_Manufacturer_regex, dev_Product_regex]
+			)
 
-		for usb_storage_num in connected_USB_storage_dev_nums:
-			self.connected_usb_storages_number_strs.append(f'.*usb {usb_storage_num}.*')
-
-		print(self.connected_usb_storages_number_strs)
+		print('Define regex for searching USB Storage devs:')
+		print(self.connected_usb_storage_devs_Manufacturer_Product_regex)
 		return True
 
-	def get_connected_USB_dev_numbers_from_target_strs(self, target_strs: list[str]):
+	def find_connected_USB_storage_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		connected_USB_dev_numbers = []
 
 		for str_with_USB_number in target_strs:
@@ -62,10 +66,10 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					connected_USB_dev_numbers.append(USB_dev_number)
 					break
 
-		connected_USB_dev_numbers_without_suffix = set(self.get_clean_USB_dev_numbers_without_suffix(connected_USB_dev_numbers))
-		print('Found connected USB devices with numbers:', connected_USB_dev_numbers_without_suffix)
+		self.connected_usb_storages_number_strs = set(self.get_clean_USB_dev_numbers_without_suffix(connected_USB_dev_numbers))
+		print('Found connected USB storage devices with numbers:', self.connected_usb_storages_number_strs)
 
-		return connected_USB_dev_numbers_without_suffix
+		return True
 
 	def get_clean_USB_dev_numbers_without_suffix(self, usb_num_strs: list[str]):
 		clean_USB_dev_numbers = []
@@ -77,11 +81,11 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	# 4) Create strings - 
 	#	1)usb-<detected_words_from_(3)> Product:
 	def get_USB_storage_Product_regex_string(self, usb_number_str: str):
-		return f".*usb-{usb_number_str} Product:"
+		return f".*usb {usb_number_str}: Product.*"
 	
 	#	2)usb-<detected_words_from_(3)> Manufacturer:
 	def get_USB_storage_Manufacturer_regex_string(self, usb_number_str: str):
-		return f"usb-{usb_number_str} Manufacturer:"
+		return f".*usb {usb_number_str}: Manufacturer.*"
 		
 		# 5) Parse created file from (1) - detect string from (4). Write them to separate file.
 	def get_USB_storage_devs_Manufacturer_Product(self, target_strs: list[str]):
@@ -103,4 +107,5 @@ if __name__ == "__main__":
 
 	target_usb_storage_strs = external_usb_dev_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
 	
-	external_usb_dev_seacher.create_connected_USB_storage_devs_regex_strs(target_usb_storage_strs)
+	external_usb_dev_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
+	external_usb_dev_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
