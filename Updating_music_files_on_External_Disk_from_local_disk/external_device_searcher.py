@@ -9,9 +9,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
 		self.connected_usb_storages_number_strs = {}
-		self.connected_usb_storages_full_name_regex_strs = []
-		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Manufacturer_regex_obj, usb-dev_Product_regex_obj], [...]]
-		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Manufacturer': '', 'Product': ''}, {},..]
+		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj], [...]]
+		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Product': '', 'Manufacturer': ''}, {},..]
 
 	def external_USB_devices_connected_to_computer(self):
 		pass
@@ -43,12 +42,29 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		return found_target_strs
 
+	def show_connected_USB_storage_devices(self):
+		print('[INFO] Found connected USB-storage devices:')
+		for usb_storage in self.connected_usb_storage_devs_by_Manufacturer_Product:
+			print(f"\tProduct: {usb_storage['Product']}, Manufacturer: {usb_storage['Manufacturer']}")
+
+	def find_all_USB_storage_devs_Manufacturer_Product_values(self, target_strs: list[str]):
+		for i in range(len(target_strs) - 1):	
+			for usb_storage_dev_regex in self.connected_usb_storage_devs_Manufacturer_Product_regex:
+				if usb_storage_dev_regex[0].match(target_strs[i]) and \
+				usb_storage_dev_regex[1].match(target_strs[i + 1]):
+					usb_storage_dev = {}
+					usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
+					usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
+					self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
+		
+		return True		
+
 	def create_connected_USB_storage_Manufacturer_Product_regex_strs(self):
 		for usb_storage_num_str in self.connected_usb_storages_number_strs:
 			dev_Manufacturer_regex = re.compile(self.get_USB_storage_Manufacturer_regex_string(usb_storage_num_str))
 			dev_Product_regex = re.compile(self.get_USB_storage_Product_regex_string(usb_storage_num_str))
 			self.connected_usb_storage_devs_Manufacturer_Product_regex.append(
-				[dev_Manufacturer_regex, dev_Product_regex]
+				[dev_Product_regex, dev_Manufacturer_regex]
 			)
 
 		print('Define regex for searching USB Storage devs:')
@@ -71,6 +87,10 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		return True
 
+	def get_connected_USB_storage_dev_Product_or_Manufacturer_value(self, target_str: str):
+		str_elems = target_str.split(':')
+		return str_elems[-1][1:] # it's last element without whitespace(in dmesg cmd string format)
+
 	def get_clean_USB_dev_numbers_without_suffix(self, usb_num_strs: list[str]):
 		clean_USB_dev_numbers = []
 		for usb_num_str in usb_num_strs:
@@ -91,10 +111,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def get_USB_storage_devs_Manufacturer_Product(self, target_strs: list[str]):
 		pass
 
-		# 6) Parse created file from (5) - detect Product and Manufacturer values and save it to list or dict.
-		# 7) If list or dict from (6) - is empty -> method returns False
-		#    If list or dict from (6) - not empty -> method returns True
-
 		# I think it will be in another class. About detection partitions of connected USB devices.
 		# N) Find from output (1) - detect words - sdb, sdc,... - as block devices, mounted to your Linux system.
 
@@ -109,3 +125,6 @@ if __name__ == "__main__":
 	
 	external_usb_dev_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
 	external_usb_dev_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
+	external_usb_dev_seacher.find_all_USB_storage_devs_Manufacturer_Product_values(usb_strs)
+
+	external_usb_dev_seacher.show_connected_USB_storage_devices()
