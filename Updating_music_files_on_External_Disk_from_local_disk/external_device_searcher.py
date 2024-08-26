@@ -11,9 +11,10 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.connected_usb_storages_number_strs = {}
 		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj], [...]]
 		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Product': '', 'Manufacturer': ''}, {},..]
+		self.disconnected_usb_storage_devs_regex = []
 
 	def external_USB_devices_connected_to_computer(self):
-		pass
+		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
 	
 	# 1) use dmesg command with grep: sudo dmesg | grep 'usb' > usb_detected_strs.txt
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_devs(self):
@@ -111,6 +112,30 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def get_USB_storage_devs_Manufacturer_Product(self, target_strs: list[str]):
 		pass
 
+
+	#======================================
+	# Also need to create methods to check if USB storage devs maybe disconnected
+	def get_disconnected_USB_storage_devs(self, target_strs: list[str]):
+		disconnected_usb_storage_devs = []
+
+		for string in target_strs:
+			for disconnected_usb_dev_regex in self.disconnected_usb_storage_devs_regex:
+				if disconnected_usb_dev_regex.match(string):
+					pass
+
+
+	def create_USB_storage_devs_disconnected_regexs(self):
+		result_devs_regexes = []
+
+		for dev_number in self.connected_usb_storages_number_strs:
+			dev_regex = re.compile(f'.*{dev_number}: USB disconnect.*')
+			result_devs_regexes.append(dev_regex)
+
+		self.disconnected_usb_storage_devs_regex = result_devs_regexes
+
+		return True
+
+
 		# I think it will be in another class. About detection partitions of connected USB devices.
 		# N) Find from output (1) - detect words - sdb, sdc,... - as block devices, mounted to your Linux system.
 
@@ -125,6 +150,7 @@ if __name__ == "__main__":
 	
 	external_usb_dev_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
 	external_usb_dev_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
+	external_usb_dev_seacher.create_USB_storage_devs_disconnected_regexs()
 	external_usb_dev_seacher.find_all_USB_storage_devs_Manufacturer_Product_values(usb_strs)
 
 	external_usb_dev_seacher.show_connected_USB_storage_devices()
