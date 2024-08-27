@@ -11,7 +11,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.connected_usb_storages_number_strs = {}
 		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj], [...]]
 		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Product': '', 'Manufacturer': ''}, {},..]
-		self.disconnected_usb_storage_devs_regex = []
+		self.disconnected_usb_storage_devs_regex = {}	# data structure - {'usb-number-1': 'regex-1', ...}
+		self.disconnected_usb_storage_devs = []
 
 	def external_USB_devices_connected_to_computer(self):
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
@@ -54,6 +55,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 				if usb_storage_dev_regex[0].match(target_strs[i]) and \
 				usb_storage_dev_regex[1].match(target_strs[i + 1]):
 					usb_storage_dev = {}
+					usb_storage_dev['usb-dmesg-number'] = self.connected_usb_storages_number_strs[i]
 					usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
 					usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
 					self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
@@ -116,20 +118,19 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	#======================================
 	# Also need to create methods to check if USB storage devs maybe disconnected
 	def get_disconnected_USB_storage_devs(self, target_strs: list[str]):
-		disconnected_usb_storage_devs = []
-
 		for string in target_strs:
-			for disconnected_usb_dev_regex in self.disconnected_usb_storage_devs_regex:
-				if disconnected_usb_dev_regex.match(string):
-					pass
+			for usb_dev_number in self.disconnected_usb_storage_devs_regex:
+				if self.disconnected_usb_storage_devs_regex[usb_dev_number].match(string):
+					disconnected_usb_storage_dev = ...
+					self.disconnected_usb_storage_devs.append()
 
 
 	def create_USB_storage_devs_disconnected_regexs(self):
-		result_devs_regexes = []
+		result_devs_regexes = {}
 
 		for dev_number in self.connected_usb_storages_number_strs:
 			dev_regex = re.compile(f'.*{dev_number}: USB disconnect.*')
-			result_devs_regexes.append(dev_regex)
+			result_devs_regexes[f'{dev_number}'] = dev_regex
 
 		self.disconnected_usb_storage_devs_regex = result_devs_regexes
 
