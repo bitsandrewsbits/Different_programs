@@ -8,20 +8,24 @@ import re
 class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
-		self.connected_usb_storages_number_strs = {}
-		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [[usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj], [...]]
-		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'Product': '', 'Manufacturer': ''}, {},..]
+		self.connected_usb_storages_number_strs = []
+		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [{'usb_dev_number': [usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj]}, {...}]
+		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': ''}, {},..]
 		self.disconnected_usb_storage_devs_regex = {}	# data structure - {'usb-number-1': 'regex-1', ...}
-		self.disconnected_usb_storage_devs = []
+		self.disconnected_usb_storage_devs = []    # data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1},...]
 
 	def external_USB_devices_connected_to_computer(self):
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
+
+	def external_usb_storage_devs_disconnected(self):
+		return len(self.disconnected_usb_storage_devs) > 0
+
+	def remove_usb_storage_devs_from_connected_devices(self):
+		pass
 	
-	# 1) use dmesg command with grep: sudo dmesg | grep 'usb' > usb_detected_strs.txt
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_devs(self):
 		os.system("sudo dmesg | grep 'usb' > usb_detected_strs.txt")
 
-	# 2) use dmesg command with grep: sudo dmesg | grep 'usb-storage' > usb_storage_strs.txt
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs(self):
 		os.system("sudo dmesg | grep 'usb-storage' > usb_storage_strs.txt")
 
@@ -51,23 +55,27 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 	def find_all_USB_storage_devs_Manufacturer_Product_values(self, target_strs: list[str]):
 		for i in range(len(target_strs) - 1):	
-			for usb_storage_dev_regex in self.connected_usb_storage_devs_Manufacturer_Product_regex:
-				if usb_storage_dev_regex[0].match(target_strs[i]) and \
-				usb_storage_dev_regex[1].match(target_strs[i + 1]):
+			for usb_storage_dev in self.connected_usb_storage_devs_Manufacturer_Product_regex:
+				usb_storage_dev_number = list(usb_storage_dev.keys())[0]
+				usb_storage_dev_Product_regex = usb_storage_dev[usb_storage_dev_number][0]
+				usb_storage_dev_Manufacturer_regex = usb_storage_dev[usb_storage_dev_number][1]
+
+				if usb_storage_dev_Product_regex.match(target_strs[i]) and \
+				usb_storage_dev_Manufacturer_regex.match(target_strs[i + 1]):
 					usb_storage_dev = {}
-					usb_storage_dev['usb-dmesg-number'] = self.connected_usb_storages_number_strs[i]
+					usb_storage_dev['usb_dmesg_number'] = usb_storage_dev_number
 					usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
 					usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
 					self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
 		
-		return True		
+		return True
 
 	def create_connected_USB_storage_Manufacturer_Product_regex_strs(self):
 		for usb_storage_num_str in self.connected_usb_storages_number_strs:
 			dev_Manufacturer_regex = re.compile(self.get_USB_storage_Manufacturer_regex_string(usb_storage_num_str))
 			dev_Product_regex = re.compile(self.get_USB_storage_Product_regex_string(usb_storage_num_str))
 			self.connected_usb_storage_devs_Manufacturer_Product_regex.append(
-				[dev_Product_regex, dev_Manufacturer_regex]
+				{usb_storage_num_str: [dev_Product_regex, dev_Manufacturer_regex]}
 			)
 
 		print('Define regex for searching USB Storage devs:')
@@ -75,55 +83,58 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return True
 
 	def find_connected_USB_storage_dev_numbers_from_target_strs(self, target_strs: list[str]):
-		connected_USB_dev_numbers = []
-
 		for str_with_USB_number in target_strs:
 			str_elements = str_with_USB_number.split(' ')
 			for elem in str_elements:
 				if self.usb_number_regex_for_dmesg_txt.match(elem):
-					USB_dev_number = elem
-					connected_USB_dev_numbers.append(USB_dev_number)
-					break
+					connected_USB_dev_number = self.get_clean_USB_dev_number_without_suffix(elem)
+					if connected_USB_dev_number not in self.connected_usb_storages_number_strs:
+						self.connected_usb_storages_number_strs.append(connected_USB_dev_number)
 
-		self.connected_usb_storages_number_strs = set(self.get_clean_USB_dev_numbers_without_suffix(connected_USB_dev_numbers))
 		print('Found connected USB storage devices with numbers:', self.connected_usb_storages_number_strs)
-
 		return True
 
 	def get_connected_USB_storage_dev_Product_or_Manufacturer_value(self, target_str: str):
 		str_elems = target_str.split(':')
 		return str_elems[-1][1:] # it's last element without whitespace(in dmesg cmd string format)
 
-	def get_clean_USB_dev_numbers_without_suffix(self, usb_num_strs: list[str]):
-		clean_USB_dev_numbers = []
-		for usb_num_str in usb_num_strs:
-			clean_USB_dev_numbers.append(usb_num_str.split(':')[0]) # add only x-x.x or x-x numbers
+	def get_clean_USB_dev_number_without_suffix(self, usb_num_str: str):
+		return usb_num_str.split(':')[0] # return only x-x.x or x-x number
 
-		return clean_USB_dev_numbers
-
-	# 4) Create strings - 
-	#	1)usb-<detected_words_from_(3)> Product:
 	def get_USB_storage_Product_regex_string(self, usb_number_str: str):
 		return f".*usb {usb_number_str}: Product.*"
 	
-	#	2)usb-<detected_words_from_(3)> Manufacturer:
 	def get_USB_storage_Manufacturer_regex_string(self, usb_number_str: str):
 		return f".*usb {usb_number_str}: Manufacturer.*"
-		
-		# 5) Parse created file from (1) - detect string from (4). Write them to separate file.
-	def get_USB_storage_devs_Manufacturer_Product(self, target_strs: list[str]):
-		pass
 
 
 	#======================================
-	# Also need to create methods to check if USB storage devs maybe disconnected
-	def get_disconnected_USB_storage_devs(self, target_strs: list[str]):
+	def show_disconnected_USB_storage_devices(self):
+		print('[INFO] Disconnected devices:')
+		for disconnected_dev in self.disconnected_usb_storage_devs:
+			print(disconnected_dev)
+			print(f"\tDevice: {disconnected_dev['Product']}, {disconnected_dev['Manufacturer']}")
+
+	def define_disconnected_USB_storage_devs(self, target_strs: list[str]):
+		disconnected_usb_dev_numbers = self.get_disconnected_USB_storage_devs_numbers(target_strs)
+
+		for connected_usb_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
+			for disconnected_dev_number in disconnected_usb_dev_numbers:
+				if connected_usb_dev['usb_dmesg_number'] == disconnected_dev_number:
+					disconnected_dev = {'Product': connected_usb_dev['Product'], 
+										'Manufacturer': connected_usb_dev['Manufacturer']
+										}
+					self.disconnected_usb_storage_devs.append(disconnected_dev)
+		return True
+
+	def get_disconnected_USB_storage_devs_numbers(self, target_strs: list[str]):
+		disconnected_usb_storage_devs_numbers = []
 		for string in target_strs:
 			for usb_dev_number in self.disconnected_usb_storage_devs_regex:
 				if self.disconnected_usb_storage_devs_regex[usb_dev_number].match(string):
-					disconnected_usb_storage_dev = ...
-					self.disconnected_usb_storage_devs.append()
+					disconnected_usb_storage_devs_numbers.append(usb_dev_number)
 
+		return disconnected_usb_storage_devs_numbers
 
 	def create_USB_storage_devs_disconnected_regexs(self):
 		result_devs_regexes = {}
@@ -155,3 +166,6 @@ if __name__ == "__main__":
 	external_usb_dev_seacher.find_all_USB_storage_devs_Manufacturer_Product_values(usb_strs)
 
 	external_usb_dev_seacher.show_connected_USB_storage_devices()
+
+	external_usb_dev_seacher.define_disconnected_USB_storage_devs(usb_strs)
+	external_usb_dev_seacher.show_disconnected_USB_storage_devices()
