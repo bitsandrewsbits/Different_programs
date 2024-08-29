@@ -12,6 +12,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [{'usb_dev_number': [usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj]}, {...}]
 		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': ''}, {},..]
 		self.disconnected_usb_storage_devs_regex = {}	# data structure - {'usb-number-1': 'regex-1', ...}
+		self.disconnected_usb_dev_numbers = []
 		self.disconnected_usb_storage_devs = []    # data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1},...]
 
 	def external_USB_devices_connected_to_computer(self):
@@ -21,7 +22,14 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return len(self.disconnected_usb_storage_devs) > 0
 
 	def remove_usb_storage_devs_from_connected_devices(self):
-		pass
+		for disconnected_usb_dev_number in self.disconnected_usb_dev_numbers:
+			for i in range(len(self.connected_usb_storage_devs_by_Manufacturer_Product)):
+				connected_usb_storage_dev_info = list(self.connected_usb_storage_devs_by_Manufacturer_Product[i].values())
+				connected_usb_storage_dev_number = connected_usb_storage_dev_info[0]
+				if disconnected_usb_dev_number == connected_usb_storage_dev_number:
+					del self.connected_usb_storage_devs_by_Manufacturer_Product[i]
+
+		return True
 	
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_devs(self):
 		os.system("sudo dmesg | grep 'usb' > usb_detected_strs.txt")
@@ -91,7 +99,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					if connected_USB_dev_number not in self.connected_usb_storages_number_strs:
 						self.connected_usb_storages_number_strs.append(connected_USB_dev_number)
 
-		print('Found connected USB storage devices with numbers:', self.connected_usb_storages_number_strs)
 		return True
 
 	def get_connected_USB_storage_dev_Product_or_Manufacturer_value(self, target_str: str):
@@ -116,10 +123,10 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 			print(f"\tDevice: {disconnected_dev['Product']}, {disconnected_dev['Manufacturer']}")
 
 	def define_disconnected_USB_storage_devs(self, target_strs: list[str]):
-		disconnected_usb_dev_numbers = self.get_disconnected_USB_storage_devs_numbers(target_strs)
+		self.disconnected_usb_dev_numbers = self.get_disconnected_USB_storage_devs_numbers(target_strs)
 
 		for connected_usb_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
-			for disconnected_dev_number in disconnected_usb_dev_numbers:
+			for disconnected_dev_number in self.disconnected_usb_dev_numbers:
 				if connected_usb_dev['usb_dmesg_number'] == disconnected_dev_number:
 					disconnected_dev = {'Product': connected_usb_dev['Product'], 
 										'Manufacturer': connected_usb_dev['Manufacturer']
@@ -151,21 +158,39 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		# I think it will be in another class. About detection partitions of connected USB devices.
 		# N) Find from output (1) - detect words - sdb, sdc,... - as block devices, mounted to your Linux system.
 
+def search_external_usb_storages(external_usb_storage_seacher):
+	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
+	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
+	usb_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
+	usb_storage_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
+
+	target_usb_storage_strs = external_usb_storage_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
+	
+	external_usb_storage_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
+	external_usb_storage_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
+	external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
+	external_usb_storage_seacher.find_all_USB_storage_devs_Manufacturer_Product_values(usb_strs)
+	external_usb_storage_seacher.define_disconnected_USB_storage_devs(usb_strs)
+
+	if external_usb_storage_seacher.external_usb_storage_devs_disconnected():
+		print('Removing disconnected usb storage device...')
+		external_usb_storage_seacher.remove_usb_storage_devs_from_connected_devices()
+
+	if external_usb_storage_seacher.external_USB_devices_connected_to_computer():
+		external_usb_storage_seacher.show_connected_USB_storage_devices()
+	else:
+		print('External USB storage devices was not found.')
+	if external_usb_storage_seacher.external_usb_storage_devs_disconnected():
+		external_usb_storage_seacher.show_disconnected_USB_storage_devices()
+
+# need also to create functions to display only changes during program execution.
+# for this part - show info about connecting new USB dev, disconnecting USB dev.
+
+def usb_storage_strs_changed():
+	pass
+
 if __name__ == "__main__":
 	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Linux_Searcher()
-	external_usb_dev_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
-	external_usb_dev_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
-	usb_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
-	usb_storage_strs = external_usb_dev_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
 
-	target_usb_storage_strs = external_usb_dev_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
+	search_external_usb_storages(external_usb_dev_seacher)
 	
-	external_usb_dev_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
-	external_usb_dev_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
-	external_usb_dev_seacher.create_USB_storage_devs_disconnected_regexs()
-	external_usb_dev_seacher.find_all_USB_storage_devs_Manufacturer_Product_values(usb_strs)
-
-	external_usb_dev_seacher.show_connected_USB_storage_devices()
-
-	external_usb_dev_seacher.define_disconnected_USB_storage_devs(usb_strs)
-	external_usb_dev_seacher.show_disconnected_USB_storage_devices()
