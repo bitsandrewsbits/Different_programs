@@ -10,12 +10,24 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
 		self.usb_strings = []
 		self.usb_storage_strings = []
+
+		# data structure - [{'usb_dev_number': 'usb-number', 'connected_status_timestamp': 'dmesg_time'}]
 		self.connected_usb_storages_number_strs = []
-		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] # data structure - [{'usb_dev_number': [usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj]}, {...}]
-		self.connected_usb_storage_devs_by_Manufacturer_Product = [] # data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': '', 'status': 'Connected/Disconnected'}, {},..]
-		self.disconnected_usb_storage_devs_regex = {}	# data structure - {'usb-number-1': 'regex-1', ...}
+		
+		# data structure - [{'usb_dev_number': [usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj]}, {...}]
+		self.connected_usb_storage_devs_Manufacturer_Product_regex = [] 
+		
+		# data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': '', 'status': 'Connected/Disconnected'}, {},..]
+		self.connected_usb_storage_devs_by_Manufacturer_Product = []
+		
+		# data structure - {'usb-number-1': 'regex-1', ...}
+		self.disconnected_usb_storage_devs_regex = {}
+		
+		# data structure - [{'usb_number': 'usb-number', 'disconnected_status_timestamp': 'dmesg_time'}]
 		self.disconnected_usb_dev_numbers = []
-		self.disconnected_usb_storage_devs = []    # data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1},...]
+
+		# data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1},...]
+		self.disconnected_usb_storage_devs = []    
 
 	def external_USB_devices_connected_to_computer(self):
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
@@ -97,6 +109,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		# print(self.connected_usb_storage_devs_Manufacturer_Product_regex)
 		return True
 
+	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
 	def find_connected_USB_storage_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		for str_with_USB_number in target_strs:
 			str_elements = str_with_USB_number.split(' ')
@@ -128,6 +141,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		print(f"\tDevice: {last_disconnected_USB_storage_device['Product']}, " 
 			  f"Manufacturer: {last_disconnected_USB_storage_device['Manufacturer']}")
 
+	# TODO: refactor - add comparing timestamps of each usb dev number in order 
+	# to set real status of connected/disconnected usb dev
 	def define_disconnected_USB_storage_devs(self, target_strs: list[str]):
 		self.disconnected_usb_dev_numbers = self.get_disconnected_USB_storage_devs_numbers(target_strs)
 
@@ -141,6 +156,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					self.disconnected_usb_storage_devs.append(disconnected_dev)
 		return True
 
+	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
 	def get_disconnected_USB_storage_devs_numbers(self, target_strs: list[str]):
 		disconnected_usb_storage_devs_numbers = []
 		for string in target_strs:
@@ -189,6 +205,14 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		return True
 
+	def get_timestamp_value_from_dmesg_cmd_line(self, dmesg_str_line: str):
+		timestamp_value = ''
+		for symbol in dmesg_str_line:
+			if symbol == ']':
+				return timestamp_value
+			if symbol.isdigit():
+				timestamp_value += symbol
+
 
 def search_external_usb_storages(external_usb_storage_seacher):
 	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
@@ -235,5 +259,5 @@ if __name__ == "__main__":
 	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Linux_Searcher()
 
 	print('Waiting and searching for external USB storage devices...')
-	while True:
-		search_external_usb_storages(external_usb_dev_seacher)
+	# while True:
+	search_external_usb_storages(external_usb_dev_seacher)
