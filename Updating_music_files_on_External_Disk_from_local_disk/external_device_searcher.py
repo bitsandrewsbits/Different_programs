@@ -206,13 +206,9 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return True
 
 	def get_timestamp_value_from_dmesg_cmd_line(self, dmesg_str_line: str):
-		timestamp_value = ''
-		for symbol in dmesg_str_line:
-			if symbol == ']':
-				return timestamp_value
-			if symbol.isdigit():
-				timestamp_value += symbol
-
+		search_timestamp_value = re.search('[0-9]+.[0-9]+', dmesg_str_line)
+		return search_timestamp_value.group(0)
+		
 
 def search_external_usb_storages(external_usb_storage_seacher):
 	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
