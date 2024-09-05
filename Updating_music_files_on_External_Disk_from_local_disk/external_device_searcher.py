@@ -2,6 +2,7 @@
 # connected external USB devices like flash, external HDD, SSD, or another.
 # if nothing external USB disk connected - to tell user about it, and terminating program.
 import os
+import subprocess as sp
 import re
 
 # experimental variant to resolve this task(first for Linux systems):
@@ -27,7 +28,9 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.disconnected_usb_dev_numbers = []
 
 		# data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1},...]
-		self.disconnected_usb_storage_devs = []    
+		self.disconnected_usb_storage_devs = []
+
+		self.program_start_exec_time_in_seconds = 0
 
 	def external_USB_devices_connected_to_computer(self):
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
@@ -249,6 +252,14 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def get_timestamp_value_from_dmesg_cmd_line(self, dmesg_str_line: str):
 		search_timestamp_value = re.search('[0-9]+.[0-9]+', dmesg_str_line)
 		return search_timestamp_value.group(0)
+
+	def set_program_start_executing_time_in_seconds(self):
+		bash_cmd = ["cat", "/proc/uptime"]
+		bash_command_output = sp.run(bash_cmd, capture_output = True, text = True)
+		bash_command_result_str = bash_command_output.stdout.strip()
+		self.program_start_exec_time_in_seconds = float(bash_command_result_str.split(' ')[0])
+
+		return True
 		
 
 def search_external_usb_storages(external_usb_storage_seacher):
@@ -293,7 +304,9 @@ def usb_storage_strs_changed(current_storage_strs: list[str], new_storage_strs: 
 
 if __name__ == "__main__":
 	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Linux_Searcher()
+	external_usb_dev_seacher.set_program_start_executing_time_in_seconds()
+	print('Uptime:', external_usb_dev_seacher.program_start_exec_time_in_seconds)
 
-	print('Waiting and searching for external USB storage devices...')
-	while True:
-		search_external_usb_storages(external_usb_dev_seacher)
+	# print('Waiting and searching for external USB storage devices...')
+	# while True:
+	# 	search_external_usb_storages(external_usb_dev_seacher)
