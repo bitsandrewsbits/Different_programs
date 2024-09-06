@@ -164,7 +164,12 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 			disconnected_dev = {'Product': connected_usb_dev['Product'], 
 								'Manufacturer': connected_usb_dev['Manufacturer']
 								}
-			self.disconnected_usb_storage_devs.append(disconnected_dev)
+			if len(self.get_all_disconnected_timestamps_for_usb_storage_dev(
+				connected_usb_storage_number)) > 0 and \
+			   max(self.get_all_disconnected_timestamps_for_usb_storage_dev(
+					connected_usb_storage_number)) < self.program_start_exec_time_in_seconds:
+				self.disconnected_usb_storage_devs.append(disconnected_dev)
+		
 		return True
 
 	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
@@ -195,6 +200,9 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return True
 
 	def set_current_usb_storage_status(self, usb_dev_number: str):
+		if len(self.get_all_disconnected_timestamps_for_usb_storage_dev(usb_dev_number)) == 0:
+			return self.set_usb_storage_dev_status_as_connected(usb_dev_number)
+
 		connected_max_timestamp = max(self.get_all_connected_timestamps_for_usb_storage_dev(usb_dev_number))
 		disconnected_max_timestamp = max(self.get_all_disconnected_timestamps_for_usb_storage_dev(usb_dev_number))
 		if connected_max_timestamp < disconnected_max_timestamp:
@@ -307,6 +315,6 @@ if __name__ == "__main__":
 	external_usb_dev_seacher.set_program_start_executing_time_in_seconds()
 	print('Uptime:', external_usb_dev_seacher.program_start_exec_time_in_seconds)
 
-	# print('Waiting and searching for external USB storage devices...')
-	# while True:
-	# 	search_external_usb_storages(external_usb_dev_seacher)
+	print('Waiting and searching for external USB storage devices...')
+	while True:
+		search_external_usb_storages(external_usb_dev_seacher)
