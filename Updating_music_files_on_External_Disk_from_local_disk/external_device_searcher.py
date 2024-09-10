@@ -200,15 +200,10 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return True
 
 	def create_USB_storage_devs_disconnected_regexs(self):
-		result_devs_regexes = {}
-
 		for usb_dev_number_timestamp in self.connected_usb_storages_number_strs:
 			usb_dev_number = usb_dev_number_timestamp['usb_dev_number']
 			dev_regex = re.compile(f'.*{usb_dev_number}: USB disconnect.*')
-			result_devs_regexes[f'{usb_dev_number}'] = dev_regex
-
-		self.disconnected_usb_storage_devs_regex = result_devs_regexes
-
+			self.disconnected_usb_storage_devs_regex[f'{usb_dev_number}'] = dev_regex
 		return True
 
 	def usb_storage_is_disconnected(self, usb_dev_number: str):
@@ -220,7 +215,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		return connected_max_timestamp < disconnected_max_timestamp
 
 	def usb_storage_is_connected(self, usb_dev_number: str):
-		if len(self.get_all_disconnected_timestamps_for_usb_storage_dev(usb_dev_number)) == 0:
+		if len(self.get_all_connected_timestamps_for_usb_storage_dev(usb_dev_number)) == 0:
 			return False
 
 		connected_max_timestamp = max(self.get_all_connected_timestamps_for_usb_storage_dev(usb_dev_number))
@@ -251,6 +246,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 				all_usb_storage_disconnected_timestamps.append(
 					usb_dev_number_timestamp['disconnected_status_timestamp']
 				)
+		if all_usb_storage_disconnected_timestamps == []:
+			return [0]
 
 		return all_usb_storage_disconnected_timestamps
 
@@ -303,9 +300,9 @@ def search_external_usb_storages(external_usb_storage_seacher):
 	target_usb_storage_strs = external_usb_storage_seacher.get_target_strings_from_strs(new_usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
 	
 	external_usb_storage_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
-	external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(new_usb_strs)
 	external_usb_storage_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
 	external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
+	external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(new_usb_strs)
 	external_usb_storage_seacher.find_connected_USB_storage_devs_Manufacturer_Product_values(new_usb_strs)
 	external_usb_storage_seacher.define_disconnected_USB_storage_devs()
 
