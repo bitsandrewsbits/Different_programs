@@ -159,8 +159,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 			)
 			print('was disconnected.\n')
 
-	# TODO: refactor - add comparing timestamps of each usb dev number in order 
-	# to set real status of connected/disconnected usb dev
 	def define_disconnected_USB_storage_devs(self):
 		for connected_usb_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
 			connected_usb_storage_number = connected_usb_dev['usb_dmesg_number']
@@ -174,14 +172,14 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 										'Product': connected_usb_dev['Product'], 
 							 			'Manufacturer': connected_usb_dev['Manufacturer']
 							 			}
-					self.disconnected_usb_storage_devs.append(disconnected_dev)
+					if disconnected_dev not in self.disconnected_usb_storage_devs:
+						self.disconnected_usb_storage_devs.append(disconnected_dev)
 		
 		return True
 
 	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
 	# In testing...
 	def find_disconnected_USB_storage_devs_numbers(self, target_strs: list[str]):
-		added_disconnected_usb_storage_numbers = []
 		for string in target_strs:
 			for usb_dev_number in self.disconnected_usb_storage_devs_regex:
 				if self.disconnected_usb_storage_devs_regex[usb_dev_number].match(string):
@@ -193,10 +191,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					disconnected_usb_storage_dev_timestamp
 					disconnected_usb_storage_dev_number_timestamp['usb_dev_number'] = usb_dev_number
 					
-					self.disconnected_usb_dev_numbers.append(disconnected_usb_storage_dev_number_timestamp)
-
-					added_disconnected_usb_storage_numbers.append(usb_dev_number)
-
+					if disconnected_usb_storage_dev_number_timestamp not in self.disconnected_usb_dev_numbers:
+						self.disconnected_usb_dev_numbers.append(disconnected_usb_storage_dev_number_timestamp)
 		return True
 
 	def create_USB_storage_devs_disconnected_regexs(self):
