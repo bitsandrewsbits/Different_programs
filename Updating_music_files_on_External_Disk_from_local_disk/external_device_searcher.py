@@ -9,8 +9,8 @@ import re
 class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
-		self.usb_strings = []
-		self.usb_storage_strings = []
+		# self.usb_strings = []
+		# self.usb_storage_strings = []
 
 		# data structure - [{'usb_dev_number': 'usb-number', 'connected_status_timestamp': 'dmesg_time'}]
 		self.connected_usb_storages_number_strs = []
@@ -128,7 +128,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 			str_elements = target_strs[i].split(' ')
 			for j in range(len(str_elements)):
 				if self.usb_number_regex_for_dmesg_txt.match(str_elements[j]) and j != len(str_elements) - 1:
-					USB_dev_number = self.get_clean_USB_dev_number_without_suffix(str_elements[j])
+					connected_USB_dev_number = self.get_clean_USB_dev_number_without_suffix(str_elements[j])
 					usb_storage_dev_number_timestamp = {}
 					usb_storage_dev_number_timestamp['usb_dev_number'] = connected_USB_dev_number
 					usb_storage_dev_number_timestamp['connected_status_timestamp'] = self.get_timestamp_value_from_dmesg_cmd_line(target_strs[i])	
@@ -304,39 +304,35 @@ def search_external_usb_storages(external_usb_storage_seacher):
 	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
 	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
 
-	new_usb_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
-	new_usb_storage_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
-	target_usb_storage_strs = external_usb_storage_seacher.get_target_strings_from_strs(new_usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
-	
+	usb_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
+	usb_storage_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
+	target_usb_storage_strs = external_usb_storage_seacher.get_target_strings_from_strs(usb_storage_strs, '.*[1-9]-[1-9][.:][1-9 ].*')
+
 	external_usb_storage_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(target_usb_storage_strs)
-	# print(external_usb_storage_seacher.connected_usb_storages_number_strs)
 	external_usb_storage_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
-	external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
-	external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(new_usb_strs)
-	external_usb_storage_seacher.find_connected_USB_storage_devs_Manufacturer_Product_values(new_usb_strs)
-	external_usb_storage_seacher.define_disconnected_USB_storage_devs()
+	# external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
+	# external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(usb_strs)
+	external_usb_storage_seacher.find_connected_USB_storage_devs_Manufacturer_Product_values(usb_strs)
+	# external_usb_storage_seacher.define_disconnected_USB_storage_devs()
+	
+	if external_usb_storage_seacher.external_USB_devices_connected_to_computer():
+		external_usb_storage_seacher.show_connected_USB_storage_devices()
+	else:
+		print('External USB storage devices was not found.')
 
-	external_usb_storage_seacher.remove_usb_storage_devs_from_connected_devices()
-
-	if usb_strs_changed(external_usb_storage_seacher.usb_strings, new_usb_strs):
-		external_usb_storage_seacher.show_disconnected_USB_storage_devices()
-
-	if usb_storage_strs_changed(external_usb_storage_seacher.usb_storage_strings, new_usb_storage_strs):
-		if external_usb_storage_seacher.external_USB_devices_connected_to_computer():
-			external_usb_storage_seacher.show_connected_USB_storage_devices()
-		else:
-			print('External USB storage devices was not found.')
+	# if external_usb_storage_seacher.connected_usb_storage_was_disconnected()
+	# 	external_usb_storage_seacher.show_disconnected_USB_storage_devices()
 
 	# print(external_usb_storage_seacher.disconnected_usb_storage_devs)
-	external_usb_storage_seacher.define_usb_strings_from_file()
-	external_usb_storage_seacher.define_usb_storage_strings_from_file()
+	# external_usb_storage_seacher.define_usb_strings_from_file()
+	# external_usb_storage_seacher.define_usb_storage_strings_from_file()
 
 
-def usb_strs_changed(current_usb_strs: list[str], new_usb_strs: list[str]):
-	return len(current_usb_strs) < len(new_usb_strs)
+# def usb_strs_changed(current_usb_strs: list[str], new_usb_strs: list[str]):
+# 	return len(current_usb_strs) < len(new_usb_strs)
 
-def usb_storage_strs_changed(current_storage_strs: list[str], new_storage_strs: list[str]):
-	return len(current_storage_strs) < len(new_storage_strs)
+# def usb_storage_strs_changed(current_storage_strs: list[str], new_storage_strs: list[str]):
+# 	return len(current_storage_strs) < len(new_storage_strs)
 
 
 
@@ -345,6 +341,10 @@ if __name__ == "__main__":
 	external_usb_dev_seacher.set_program_start_executing_time_in_seconds()
 	print('Uptime:', external_usb_dev_seacher.program_start_exec_time_in_seconds)
 
-	print('Waiting and searching for external USB storage devices...')
 	while True:
-		search_external_usb_storages(external_usb_dev_seacher)
+		user_answer = input('Search external USB storage devices?[y/n]: ')
+		if user_answer == 'y':
+			search_external_usb_storages(external_usb_dev_seacher)
+		else:
+			print('Exiting from searching USB storages.')
+			break
