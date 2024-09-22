@@ -97,13 +97,15 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 				if usb_storage_dev_Product_regex.match(target_strs[i]) and \
 				usb_storage_dev_Manufacturer_regex.match(target_strs[i + 1]):
 					if self.usb_storage_is_connected(usb_storage_dev_number):
+						# print('TRUE-' * 4)
 						usb_storage_dev = {}
 						usb_storage_dev['usb_dmesg_number'] = usb_storage_dev_number
 						usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
 						usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
 						usb_storage_dev['status'] = 'Connected'
 					
-						current_added_connected_usb_storage_nums = self.get_connected_usb_storage_numbers()
+						current_added_connected_usb_storage_nums = self.get_current_added_connected_usb_storage_numbers()
+						print(current_added_connected_usb_storage_nums)
 						if usb_storage_dev_number not in current_added_connected_usb_storage_nums:
 							self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
 		return True
@@ -141,6 +143,12 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		print('Connected usb numbers: ', self.connected_usb_storages_number_strs)
 		return True
+
+	def get_current_added_connected_usb_storage_numbers(self):
+		added_connected_usb_storage_numbers = [] 
+		for usb_storage_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
+			added_connected_usb_storage_numbers.append(usb_storage_dev['usb_dmesg_number'])
+		return added_connected_usb_storage_numbers
 
 	def get_connected_USB_storage_dev_Product_or_Manufacturer_value(self, target_str: str):
 		str_elems = target_str.split(':')
