@@ -38,17 +38,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 	def external_usb_storage_devs_disconnected(self):
 		return len(self.disconnected_usb_storage_devs) > 0
-
-	def update_connected_usb_storage_numbers(self):
-		result_connected_usb_storage_numbers_timestamps = []
-		current_disconnected_usb_storage_numbers = self.get_disconnected_usb_storage_numbers()
-		for current_connected_usb_storage_num in self.connected_usb_storages_number_strs:
-			if current_connected_usb_storage_num['usb_dev_number'] not in current_disconnected_usb_storage_numbers:
-				result_connected_usb_storage_numbers_timestamps.append(current_connected_usb_storage_num)
-
-		self.connected_usb_storages_number_strs = result_connected_usb_storage_numbers_timestamps
-		print('After updating: ', self.connected_usb_storages_number_strs)
-		return True
 	
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_devs(self):
 		os.system("sudo dmesg | grep 'usb' > usb_detected_strs.txt")
@@ -108,6 +97,29 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 						print(current_added_connected_usb_storage_nums)
 						if usb_storage_dev_number not in current_added_connected_usb_storage_nums:
 							self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
+		return True
+
+	def update_connected_usb_storage_numbers(self):
+		print('Before updating: ', self.connected_usb_storages_number_strs)
+		result_connected_usb_storage_numbers_timestamps = []
+		# current_disconnected_usb_storage_numbers = self.get_disconnected_usb_storage_numbers()
+		for current_connected_usb_storage_num in self.connected_usb_storages_number_strs:
+			if self.usb_storage_is_connected(current_connected_usb_storage_num['usb_dev_number']):
+				result_connected_usb_storage_numbers_timestamps.append(current_connected_usb_storage_num)
+
+		self.connected_usb_storages_number_strs = result_connected_usb_storage_numbers_timestamps
+		print('After updating: ', self.connected_usb_storages_number_strs)
+		return True
+
+	def update_connected_usb_storage_devices(self):
+		updated_connected_usb_storage_devices = []
+		current_connected_usb_storage_numbers = self.get_connected_usb_storage_numbers()
+
+		for usb_storage_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
+			if usb_storage_dev['usb_dmesg_number'] in current_connected_usb_storage_numbers:
+				updated_connected_usb_storage_devices.append(usb_storage_dev)
+
+		self.connected_usb_storage_devs_by_Manufacturer_Product = updated_connected_usb_storage_devices
 		return True
 
 	def create_connected_USB_storage_Manufacturer_Product_regex_strs(self):
@@ -275,6 +287,7 @@ def search_external_usb_storages(external_usb_storage_seacher):
 	external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
 	external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(usb_strs)
 	external_usb_storage_seacher.update_connected_usb_storage_numbers()
+	external_usb_storage_seacher.update_connected_usb_storage_devices()
 	external_usb_storage_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
 	external_usb_storage_seacher.find_connected_USB_storage_devs_Manufacturer_Product_values(usb_strs)
 	
