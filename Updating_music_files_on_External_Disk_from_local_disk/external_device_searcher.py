@@ -85,18 +85,16 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 				if usb_storage_dev_Product_regex.match(target_strs[i]) and \
 				usb_storage_dev_Manufacturer_regex.match(target_strs[i + 1]):
-					if self.usb_storage_is_connected(usb_storage_dev_number):
-						# print('TRUE-' * 4)
-						usb_storage_dev = {}
-						usb_storage_dev['usb_dmesg_number'] = usb_storage_dev_number
-						usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
-						usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
-						usb_storage_dev['status'] = 'Connected'
-					
-						current_added_connected_usb_storage_nums = self.get_current_added_connected_usb_storage_numbers()
-						print(current_added_connected_usb_storage_nums)
-						if usb_storage_dev_number not in current_added_connected_usb_storage_nums:
-							self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
+					usb_storage_dev = {}
+					usb_storage_dev['usb_dmesg_number'] = usb_storage_dev_number
+					usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
+					usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
+					usb_storage_dev['status'] = 'Connected'
+				
+					current_added_connected_usb_storage_nums = self.get_current_added_connected_usb_storage_numbers()
+					print(current_added_connected_usb_storage_nums)
+					if usb_storage_dev_number not in current_added_connected_usb_storage_nums:
+						self.connected_usb_storage_devs_by_Manufacturer_Product.append(usb_storage_dev)
 		return True
 
 	def update_connected_usb_storage_numbers(self):
@@ -120,9 +118,11 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 				updated_connected_usb_storage_devices.append(usb_storage_dev)
 
 		self.connected_usb_storage_devs_by_Manufacturer_Product = updated_connected_usb_storage_devices
+		print('After updating(usb storage devs):', self.connected_usb_storage_devs_by_Manufacturer_Product)
 		return True
 
 	def create_connected_USB_storage_Manufacturer_Product_regex_strs(self):
+		self.connected_usb_storage_devs_Manufacturer_Product_regex = []
 		for usb_storage_num_timestamp in self.connected_usb_storages_number_strs:
 			dev_Manufacturer_regex = re.compile(self.get_USB_storage_Manufacturer_regex_string(
 				usb_storage_num_timestamp['usb_dev_number']))
@@ -132,15 +132,13 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 			self.connected_usb_storage_devs_Manufacturer_Product_regex.append(
 				{usb_storage_num_timestamp['usb_dev_number']: [dev_Product_regex, dev_Manufacturer_regex]}
 			)
-
-		# print('Define regex for searching USB Storage devs:')
+ 
 		return True
 
 	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
 	# In testing...
 	def find_connected_USB_storage_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		for i in range(len(target_strs) - 1, -1, -1):
-			print(target_strs[i])
 			str_elements = target_strs[i].split(' ')
 			for j in range(len(str_elements)):
 				if self.usb_number_regex_for_dmesg_txt.match(str_elements[j]) and j != len(str_elements) - 1:
@@ -181,7 +179,9 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 	# TODO: Refactoring and fixing process...
 	def find_disconnected_USB_storage_devs_numbers(self, target_strs: list[str]):
+		self.disconnected_usb_dev_numbers = []
 		for i in range(len(target_strs) - 1, 0, -1):
+			print(target_strs[i])
 			for usb_dev_number in self.disconnected_usb_storage_devs_regex:
 				if self.disconnected_usb_storage_devs_regex[usb_dev_number].match(target_strs[i]):
 					disconnected_usb_storage_dev_timestamp = self.get_timestamp_value_from_dmesg_cmd_line(target_strs[i])
@@ -222,7 +222,9 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		connected_max_timestamp = max(all_connected_timestamps_for_usb_storage_dev)
 		disconnected_max_timestamp = max(all_disconnected_timestamps_for_usb_storage_dev)
 		
-		if connected_max_timestamp > disconnected_max_timestamp	or \
+		if connected_max_timestamp < disconnected_max_timestamp:
+			return False
+		elif connected_max_timestamp > disconnected_max_timestamp or \
 		connected_max_timestamp >= self.program_start_exec_time_in_seconds:
 			return True
 		else:
