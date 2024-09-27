@@ -18,7 +18,7 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		# data structure - [{'usb_dev_number': [usb-dev_Product_regex_obj, usb-dev_Manufacturer_regex_obj]}, {...}]
 		self.connected_usb_storage_devs_Manufacturer_Product_regex = []
 		
-		# data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': '', 'status': 'Connected/Disconnected'}, {},..]
+		# data structure - [{'usb_dmesg_number': 'usb-number-1', 'Product': '', 'Manufacturer': ''}, {},..]
 		self.connected_usb_storage_devs_by_Manufacturer_Product = []
 		
 		# data structure - {'usb-number-1': 'regex-1', ...}
@@ -89,7 +89,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					usb_storage_dev['usb_dmesg_number'] = usb_storage_dev_number
 					usb_storage_dev['Product'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i])
 					usb_storage_dev['Manufacturer'] = self.get_connected_USB_storage_dev_Product_or_Manufacturer_value(target_strs[i + 1])
-					usb_storage_dev['status'] = 'Connected'
 				
 					current_added_connected_usb_storage_nums = self.get_current_added_connected_usb_storage_numbers()
 					print(current_added_connected_usb_storage_nums)
@@ -252,18 +251,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 				)
 		
 		return all_usb_storage_disconnected_timestamps
-
-	def get_usb_storage_dev_status(self, usb_dev_number: str):
-		for usb_storage_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
-			if usb_storage_dev['usb_dmesg_number'] == usb_dev_number:
-				return usb_storage_dev['status']
-
-	def set_usb_storage_dev_status_as_connected(self, usb_dev_number: str):
-		for usb_storage_dev in self.connected_usb_storage_devs_by_Manufacturer_Product:
-			if usb_storage_dev['usb_dmesg_number'] == usb_dev_number:
-				usb_storage_dev['status'] = 'Connected'
-
-		return True
 
 	def get_timestamp_value_from_dmesg_cmd_line(self, dmesg_str_line: str):
 		search_timestamp_value = re.search('[0-9]+.[0-9]+', dmesg_str_line)
