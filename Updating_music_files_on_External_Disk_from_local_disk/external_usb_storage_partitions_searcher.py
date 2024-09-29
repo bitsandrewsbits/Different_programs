@@ -8,19 +8,32 @@ class External_USB_Storage_Partitions_Searcher:
 		self.all_connected_usb_storage_devices = all_connected_usb_storage_devices
 		self.selected_usb_storage_device = selected_usb_storage_device
 		self.lsblk_cmd = ["lsblk"]
+		self.usb_storage_devs_lsblk_start_str = 'sdb'
 		self.all_partitions_of_all_connected_usb_storage_devs = []
 		self.all_partitions_of_selected_usb_dev = []
 
-	# bash command - lsblk | grep "sd[b-z]".
+	# bash command - lsblk
 	# Task: parse output from this command and define
 	# and attach right partitions to the right usb storage devices
 	def find_all_partitions_of_selected_usb_device(self):
 		pass
 
-	def parse_output_lsblk_output_strings(self):
-		pass
+	def get_usb_storage_partitions_lsblk_output_strings(self):
+		usb_storages_partitions_strs = []
+		lsblk_output_strings = self.parse_output_lsblk_output_strings()
+		for i in range(len(lsblk_output_strings)):
+			if self.usb_storage_devs_lsblk_start_str in lsblk_output_strings[i]:
+				usb_storages_partitions_strs = lsblk_output_strings[i:]
+				break
 
-	def get_output_strings_from_lsblk_cmd(self):
+		print(usb_storages_partitions_strs)
+		return usb_storages_partitions_strs
+
+	def parse_output_lsblk_output_strings(self):
+		lsblk_output_strings = self.get_output_from_lsblk_cmd().split('\n')
+		return lsblk_output_strings
+
+	def get_output_from_lsblk_cmd(self):
 		bash_command_output = sp.run(self.lsblk_cmd, capture_output = True, text = True)
 		bash_command_result_strs = bash_command_output.stdout.strip()
 
@@ -30,4 +43,4 @@ class External_USB_Storage_Partitions_Searcher:
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
 
-	external_usb_storage_partitions_seacher.execute_target_lsblk_cmd()
+	external_usb_storage_partitions_seacher.get_usb_storage_partitions_lsblk_output_strings()
