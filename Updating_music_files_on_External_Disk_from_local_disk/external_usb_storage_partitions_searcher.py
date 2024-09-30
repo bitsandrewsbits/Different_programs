@@ -9,7 +9,10 @@ class External_USB_Storage_Partitions_Searcher:
 		self.selected_usb_storage_device = selected_usb_storage_device
 		self.lsblk_cmd = ["lsblk"]
 		self.usb_storage_devs_lsblk_start_str = 'sdb'
-		self.all_partitions_of_all_connected_usb_storage_devs = []
+
+		# data structure - [{'disk-1': ['partition-1_mount-point', 'partition-2_mount-point']}, {'disk-2': [...]}, ...]
+		self.all_partitions_of_all_connected_usb_storage_devs_by_disks = []
+		
 		self.all_partitions_of_selected_usb_dev = []
 
 	# bash command - lsblk
@@ -17,6 +20,17 @@ class External_USB_Storage_Partitions_Searcher:
 	# and attach right partitions to the right usb storage devices
 	def find_all_partitions_of_selected_usb_device(self):
 		pass
+
+	def get_usb_storages_partitions_by_disks(self):
+		target_lsblk_strings = self.get_usb_storage_partitions_lsblk_output_strings()
+
+		for lsblk_str in target_lsblk_strings:
+			if self.lsblk_string_contain_usb_disk_Linux_name(lsblk_str):
+				print('Found external usb disk:', lsblk_str)
+
+	def lsblk_string_contain_usb_disk_Linux_name(self, lsblk_str: str):
+		str_elements = lsblk_str.split(' ')
+		return str_elements[0].isalpha()
 
 	def get_usb_storage_partitions_lsblk_output_strings(self):
 		usb_storages_partitions_strs = []
@@ -43,4 +57,4 @@ class External_USB_Storage_Partitions_Searcher:
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
 
-	external_usb_storage_partitions_seacher.get_usb_storage_partitions_lsblk_output_strings()
+	external_usb_storage_partitions_seacher.get_usb_storages_partitions_by_disks()
