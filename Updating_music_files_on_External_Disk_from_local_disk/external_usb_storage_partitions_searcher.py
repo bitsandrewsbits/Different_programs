@@ -27,10 +27,18 @@ class External_USB_Storage_Partitions_Searcher:
 		for lsblk_str in target_lsblk_strings:
 			if self.lsblk_string_contain_usb_disk_Linux_name(lsblk_str):
 				print('Found external usb disk:', lsblk_str)
+			elif self.lsblk_string_contain_usb_partition_Linux_name(lsblk_str):
+				print('Found external usb disk partition:', lsblk_str)
+		# TODO: think how to create grouping partitions by disks
 
 	def lsblk_string_contain_usb_disk_Linux_name(self, lsblk_str: str):
 		str_elements = lsblk_str.split(' ')
 		return str_elements[0].isalpha()
+
+	def lsblk_string_contain_usb_partition_Linux_name(self, lsblk_str: str):
+		str_elements = lsblk_str.split(' ')
+		target_partition_str_elem = str_elements[0][2:]  # without vector line
+		return target_partition_str_elem.isalnum()
 
 	def get_usb_storage_partitions_lsblk_output_strings(self):
 		usb_storages_partitions_strs = []
