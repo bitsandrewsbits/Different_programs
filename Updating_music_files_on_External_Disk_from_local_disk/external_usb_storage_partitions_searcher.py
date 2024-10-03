@@ -21,7 +21,7 @@ class External_USB_Storage_Partitions_Searcher:
 	def find_all_partitions_of_selected_usb_device(self):
 		pass
 
-	def get_usb_storages_partitions_by_disks(self):
+	def find_usb_storages_mountpoints_by_disks(self):
 		target_lsblk_strings = self.get_usb_storage_partitions_lsblk_output_strings()
 
 		for lsblk_str in target_lsblk_strings:
@@ -34,10 +34,12 @@ class External_USB_Storage_Partitions_Searcher:
 					current_usb_disk_dev)
 
 			elif self.lsblk_string_contain_usb_partition_Linux_name(lsblk_str):
-				print('Found external usb disk partition:', lsblk_str)
-				current_usb_disk_dev[usb_disk_dev_name].append()
+				usb_disk_mountpoint = self.get_usb_disk_mountpoint_from_lsblk_string(lsblk_str)
+				print('Found external usb disk mountpoint:', usb_disk_mountpoint)
+				current_usb_disk_dev[usb_disk_dev_name].append(usb_disk_mountpoint)
 
-		# TODO: think how to create grouping partitions by disks - in process...
+		print(self.all_partitions_of_all_connected_usb_storage_devs_by_disks)
+		return True
 
 	def lsblk_string_contain_usb_disk_Linux_name(self, lsblk_str: str):
 		str_elements = lsblk_str.split(' ')
@@ -52,8 +54,9 @@ class External_USB_Storage_Partitions_Searcher:
 		str_elements = lsblk_str.split(' ')
 		return str_elements[0]
 
-	def get_usb_disk_mountpoint_from_lsblk_string(self, lsblk_str):
-		pass
+	def get_usb_disk_mountpoint_from_lsblk_string(self, lsblk_str: str):
+		str_elements = lsblk_str.split(' ')
+		return str_elements[-1]
 		
 	def get_usb_storage_partitions_lsblk_output_strings(self):
 		usb_storages_partitions_strs = []
@@ -75,9 +78,12 @@ class External_USB_Storage_Partitions_Searcher:
 		bash_command_result_strs = bash_command_output.stdout.strip()
 
 		return bash_command_result_strs
+
+	#TODO: think how to create method for attaching right mountpoints to the right usb
+	# storage devices.
 	
 
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
 
-	external_usb_storage_partitions_seacher.get_usb_storages_partitions_by_disks()
+	external_usb_storage_partitions_seacher.find_usb_storages_mountpoints_by_disks()
