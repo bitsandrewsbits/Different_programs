@@ -1,12 +1,10 @@
-# Class that searching on selected usb storage device all partitions
-# and show it
+# Class that searching all partitions of connected usb storage devices
 import re
 import subprocess as sp
+import external_device_searcher as ex_dev_srch
 
 class External_USB_Storage_Partitions_Searcher:
 	def __init__(self, all_connected_usb_storage_devices = [], selected_usb_storage_device = {}):
-		self.all_connected_usb_storage_devices = all_connected_usb_storage_devices
-		self.selected_usb_storage_device = selected_usb_storage_device
 		self.lsblk_cmd = ["lsblk"]
 		self.usb_storage_devs_lsblk_start_str = 'sdb'
 
@@ -15,9 +13,6 @@ class External_USB_Storage_Partitions_Searcher:
 		
 		self.all_partitions_of_selected_usb_dev = []
 
-	# bash command - lsblk
-	# Task: parse output from this command and define
-	# and attach right partitions to the right usb storage devices
 	def find_all_partitions_of_selected_usb_device(self):
 		pass
 
@@ -78,12 +73,13 @@ class External_USB_Storage_Partitions_Searcher:
 		bash_command_result_strs = bash_command_output.stdout.strip()
 
 		return bash_command_result_strs
-
-	#TODO: think how to create method for attaching right mountpoints to the right usb
-	# storage devices.
 	
 
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
 
 	external_usb_storage_partitions_seacher.find_usb_storages_mountpoints_by_disks()
+
+
+
+
