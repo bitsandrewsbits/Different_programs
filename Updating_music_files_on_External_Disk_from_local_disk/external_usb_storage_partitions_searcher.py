@@ -10,11 +10,6 @@ class External_USB_Storage_Partitions_Searcher:
 
 		# data structure - [{'disk-1': ['partition-1_mount-point', 'partition-2_mount-point']}, {'disk-2': [...]}, ...]
 		self.all_partitions_of_all_connected_usb_storage_devs_by_disks = []
-		
-		self.all_partitions_of_selected_usb_dev = []
-
-	def find_all_partitions_of_selected_usb_device(self):
-		pass
 
 	def find_usb_storages_mountpoints_by_disks(self):
 		target_lsblk_strings = self.get_usb_storage_partitions_lsblk_output_strings()

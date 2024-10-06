@@ -9,8 +9,6 @@ import re
 class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def __init__(self):
 		self.usb_number_regex_for_dmesg_txt = re.compile('.*[1-9]-[1-9][.:][1-9 ].*')
-		# self.usb_strings = []
-		# self.usb_storage_strings = []
 
 		# data structure - [{'usb_dev_number': 'usb-number', 'connected_status_timestamp': 'dmesg_time'}]
 		self.connected_usb_storages_number_strs = []
@@ -35,21 +33,12 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def external_USB_devices_connected_to_computer(self):
 		print(self.connected_usb_storage_devs_by_Manufacturer_Product)
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
-
-	def external_usb_storage_devs_disconnected(self):
-		return len(self.disconnected_usb_storage_devs) > 0
 	
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_devs(self):
 		os.system("sudo dmesg | grep 'usb' > usb_detected_strs.txt")
 
 	def get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs(self):
 		os.system("sudo dmesg | grep 'usb-storage' > usb_storage_strs.txt")
-
-	def define_usb_strings_from_file(self):
-		self.usb_strings = self.get_strings_from_txt_file('usb_detected_strs.txt')
-
-	def define_usb_storage_strings_from_file(self):
-		self.usb_storage_strings = self.get_strings_from_txt_file('usb_storage_strs.txt')
 
 	def get_strings_from_txt_file(self, filename: str):
 		result_file_strs = []
