@@ -1,7 +1,6 @@
 # Class that searching all partitions of connected usb storage devices
 import re
 import subprocess as sp
-import external_device_searcher as ex_dev_srch
 
 class External_USB_Storage_Partitions_Searcher:
 	def __init__(self, all_connected_usb_storage_devices = [], selected_usb_storage_device = {}):
