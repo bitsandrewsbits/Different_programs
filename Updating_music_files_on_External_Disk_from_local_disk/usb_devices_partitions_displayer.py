@@ -20,5 +20,12 @@ class USB_Devices_Partitions_Displayer:
 		return True
 
 	def show_info_about_usb_storages_partitions(self):
-		pass
+		for usb_storage_dev in self.all_connected_usb_storage_devs_with_partitions:
+			print('USB Storage Product :', usb_storage_dev['Product'])
+			print('USB Storage Manufacturer: ', usb_storage_dev['Manufacturer'])
+			for usb_partition_mountpoint in usb_storage_dev['partitions_mountpoints']:
+				print('Partitions:')
+				print('\tMountpoint_path:', usb_partition_mountpoint)
+			print('=' * 40)
+		return True
 
