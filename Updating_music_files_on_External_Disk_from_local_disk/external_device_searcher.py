@@ -30,6 +30,40 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 
 		self.program_start_exec_time_in_seconds = 0
 
+	def main(self):
+		while True:
+			user_answer = input('Search external USB storage devices?[y/n]: ')
+			if user_answer == 'y':
+				self.set_program_start_executing_time_in_seconds()
+				self.search_external_usb_storages()
+				if self.external_USB_devices_connected_to_computer():
+					self.show_connected_USB_storage_devices()
+				else:
+					print('[INFO] External USB storage devices was not found.')
+			else:
+				print('Exiting from searching USB storages.')
+				break
+
+	def search_external_usb_storages(self):
+		self.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
+		self.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
+
+		usb_strs = self.get_strings_from_txt_file('usb_detected_strs.txt')
+		usb_storage_strs = self.get_strings_from_txt_file('usb_storage_strs.txt')
+
+		self.find_connected_USB_storage_dev_numbers_from_target_strs(usb_storage_strs)
+		self.create_USB_storage_devs_disconnected_regexs()
+		self.find_disconnected_USB_storage_devs_numbers(usb_strs)
+		self.update_connected_usb_storage_numbers()
+		self.update_connected_usb_storage_devices()
+		self.create_connected_USB_storage_Manufacturer_Product_regex_strs()
+		self.find_connected_USB_storage_devs_Manufacturer_Product_values(usb_strs)
+		
+		return True
+
+	def get_connected_usb_storage_devices(self):
+		return self.connected_usb_storage_devs_by_Manufacturer_Product
+
 	def external_USB_devices_connected_to_computer(self):
 		print(self.connected_usb_storage_devs_by_Manufacturer_Product)
 		return len(self.connected_usb_storage_devs_by_Manufacturer_Product) > 0
@@ -88,7 +122,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 	def update_connected_usb_storage_numbers(self):
 		print('Before updating: ', self.connected_usb_storages_number_strs)
 		result_connected_usb_storage_numbers_timestamps = []
-		# current_disconnected_usb_storage_numbers = self.get_disconnected_usb_storage_numbers()
 		for current_connected_usb_storage_num in self.connected_usb_storages_number_strs:
 			if self.usb_storage_is_connected(current_connected_usb_storage_num['usb_dev_number']):
 				result_connected_usb_storage_numbers_timestamps.append(current_connected_usb_storage_num)
@@ -123,8 +156,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
  
 		return True
 
-	# TODO: refactor - add timestamp of each usb dev number from dmesg cmd lines(from brackets)
-	# In testing...
 	def find_connected_USB_storage_dev_numbers_from_target_strs(self, target_strs: list[str]):
 		for i in range(len(target_strs) - 1, -1, -1):
 			str_elements = target_strs[i].split(' ')
@@ -165,7 +196,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		usb_numbers = [list(usb_number_str.values())[0] for usb_number_str in self.connected_usb_storages_number_strs]
 		return usb_numbers
 
-	# TODO: Refactoring and fixing process...
 	def find_disconnected_USB_storage_devs_numbers(self, target_strs: list[str]):
 		self.disconnected_usb_dev_numbers = []
 		for i in range(len(target_strs) - 1, 0, -1):
@@ -252,38 +282,8 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.program_start_exec_time_in_seconds = float(bash_command_result_str.split(' ')[0])
 
 		return True
-		
-
-def search_external_usb_storages(external_usb_storage_seacher):
-	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()
-	external_usb_storage_seacher.get_and_write_info_from_dmesg_cmd_about_connected_USB_storage_devs()
-
-	usb_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_detected_strs.txt')
-	usb_storage_strs = external_usb_storage_seacher.get_strings_from_txt_file('usb_storage_strs.txt')
-
-	external_usb_storage_seacher.find_connected_USB_storage_dev_numbers_from_target_strs(usb_storage_strs)
-	external_usb_storage_seacher.create_USB_storage_devs_disconnected_regexs()
-	external_usb_storage_seacher.find_disconnected_USB_storage_devs_numbers(usb_strs)
-	external_usb_storage_seacher.update_connected_usb_storage_numbers()
-	external_usb_storage_seacher.update_connected_usb_storage_devices()
-	external_usb_storage_seacher.create_connected_USB_storage_Manufacturer_Product_regex_strs()
-	external_usb_storage_seacher.find_connected_USB_storage_devs_Manufacturer_Product_values(usb_strs)
-	
-	if external_usb_storage_seacher.external_USB_devices_connected_to_computer():
-		external_usb_storage_seacher.show_connected_USB_storage_devices()
-	else:
-		print('External USB storage devices was not found.')
 
 
 if __name__ == "__main__":
-	external_usb_dev_seacher = External_Connected_USB_Disk_Devices_Linux_Searcher()
-	external_usb_dev_seacher.set_program_start_executing_time_in_seconds()
-	print('Uptime:', external_usb_dev_seacher.program_start_exec_time_in_seconds)
-
-	while True:
-		user_answer = input('Search external USB storage devices?[y/n]: ')
-		if user_answer == 'y':
-			search_external_usb_storages(external_usb_dev_seacher)
-		else:
-			print('Exiting from searching USB storages.')
-			break
+	external_usb_storage_searcher = External_Connected_USB_Disk_Devices_Linux_Searcher()
+	external_usb_storage_searcher.main()
