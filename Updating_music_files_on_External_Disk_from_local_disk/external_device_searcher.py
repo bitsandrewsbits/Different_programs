@@ -31,18 +31,20 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 		self.program_start_exec_time_in_seconds = 0
 
 	def main(self):
+		self.set_program_start_executing_time_in_seconds()
 		while True:
 			user_answer = input('Search external USB storage devices?[y/n]: ')
 			if user_answer == 'y':
-				self.set_program_start_executing_time_in_seconds()
 				self.search_external_usb_storages()
 				if self.external_USB_devices_connected_to_computer():
 					self.show_connected_USB_storage_devices()
+					return True
 				else:
 					print('[INFO] External USB storage devices was not found.')
+					return False
 			else:
 				print('Exiting from searching USB storages.')
-				break
+				return True
 
 	def search_external_usb_storages(self):
 		self.get_and_write_info_from_dmesg_cmd_about_connected_USB_devs()

@@ -30,6 +30,9 @@ class External_USB_Storage_Partitions_Searcher:
 		print(self.all_partitions_of_all_connected_usb_storage_devs_by_disks)
 		return True
 
+	def get_usb_storage_partition_mountpoints_by_disks(self):
+		return self.all_partitions_of_all_connected_usb_storage_devs_by_disks
+
 	def lsblk_string_contain_usb_disk_Linux_name(self, lsblk_str: str):
 		str_elements = lsblk_str.split(' ')
 		return str_elements[0].isalpha()

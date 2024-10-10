@@ -11,15 +11,17 @@ class USB_Devices_Partitions_Displayer:
 		self.all_connected_usb_storage_devs_with_partitions = []
 
 	def compose_usb_storage_devices_with_partitions(self):
-		all_connected_usb_storage_disks = self.all_connected_usb_storages_partitions.keys()
+		all_connected_usb_storage_disks = [list(usb_disk.keys())[0] for usb_disk in self.all_connected_usb_storages_partitions]
+		print(all_connected_usb_storage_disks)
 		for i in range(len(self.all_connected_usb_storage_devices)):
 			total_usb_storage_device_info = self.all_connected_usb_storage_devices[i]
-			total_usb_storage_device_info['partitions_mountpoints'] = 
+			total_usb_storage_device_info['partitions_mountpoints'] = \
 			self.all_connected_usb_storages_partitions[i][all_connected_usb_storage_disks[i]]
 			self.all_connected_usb_storage_devs_with_partitions.append(total_usb_storage_device_info)
 		return True
 
 	def show_info_about_usb_storages_partitions(self):
+		print('Total information about connected USB Storage Devices:')
 		for usb_storage_dev in self.all_connected_usb_storage_devs_with_partitions:
 			print('USB Storage Product :', usb_storage_dev['Product'])
 			print('USB Storage Manufacturer: ', usb_storage_dev['Manufacturer'])
