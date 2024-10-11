@@ -18,7 +18,9 @@ class External_Device_Music_Updater:
 			self.external_usb_storage_partitions_searcher.find_usb_storages_mountpoints_by_disks()
 			self.show_connected_usb_storage_devs_and_partitions()
 
-			user_input = input('Select connected USB Storage Device:')
+			user_input = input('Select connected USB Storage Partition Mountpoint\n[press leftside number]:')
+			if user_input.isdigit():
+				user_input_number = int(user_input)
 		
 		# TODO: finish this method
 
@@ -30,6 +32,7 @@ class External_Device_Music_Updater:
 			connected_usb_storage_devices, connected_usb_storages_partitions
 		)
 		usb_devices_partitions_displayer.compose_usb_storage_devices_with_partitions()
+		
 		usb_devices_partitions_displayer.show_info_about_usb_storages_partitions()
 
 if __name__ == '__main__':

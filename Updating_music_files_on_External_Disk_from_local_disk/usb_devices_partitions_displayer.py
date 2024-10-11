@@ -7,7 +7,7 @@ class USB_Devices_Partitions_Displayer:
 		self.all_connected_usb_storages_partitions = all_usb_storages_partitions
 
 		# data structure - [{'Product': 'USB-Product-1', 'Manufacturer': Manufacturer-1, 
-		# 'partitions_mountpoints': ['abs_path_part-1', 'abs_path_part-2', ...]}, ...]
+		# 'partitions_mountpoints': [{'number': partition_number-1, 'mountpoint': 'abs_path_part-1'}, {'number': partition_number-2 'abs_path_part-2'}, ...]}, ...]
 		self.all_connected_usb_storage_devs_with_partitions = []
 
 	def compose_usb_storage_devices_with_partitions(self):
@@ -26,8 +26,10 @@ class USB_Devices_Partitions_Displayer:
 			print('USB Storage Product :', usb_storage_dev['Product'])
 			print('USB Storage Manufacturer: ', usb_storage_dev['Manufacturer'])
 			for usb_partition_mountpoint in usb_storage_dev['partitions_mountpoints']:
+				partition_number = usb_partition_mountpoint['number']
+				partition_mountpoint = usb_partition_mountpoint['mountpoint']
 				print('Partitions:')
-				print('\tMountpoint_path:', usb_partition_mountpoint)
+				print(f'\t({partition_number}) Mountpoint_path: {partition_mountpoint}')
 			print('=' * 40)
 		return True
 
