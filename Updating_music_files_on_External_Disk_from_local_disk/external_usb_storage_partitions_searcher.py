@@ -9,8 +9,10 @@ class External_USB_Storage_Partitions_Searcher:
 
 		# data structure - [{'disk-1': [{'number': partition_number-1, 'mountpoint': 'abs_path_part-1'}, {}, ...]}, ...]}, {'disk-2': [...]}, ...]
 		self.all_partitions_of_all_connected_usb_storage_devs_by_disks = []
+		self.all_partitions_numbers = []
 
 	def find_usb_storages_mountpoints_by_disks(self):
+		self.all_partitions_numbers = []
 		target_lsblk_strings = self.get_usb_storage_partitions_lsblk_output_strings()
 
 		partition_number = 1
@@ -30,6 +32,7 @@ class External_USB_Storage_Partitions_Searcher:
 				current_usb_disk_partition['number'] = partition_number
 				current_usb_disk_partition['mountpoint'] = usb_disk_mountpoint
 				current_usb_disk_dev[usb_disk_dev_name].append(current_usb_disk_partition)
+				self.all_partitions_numbers.append(partition_number)
 				partition_number += 1
 
 		print(self.all_partitions_of_all_connected_usb_storage_devs_by_disks)

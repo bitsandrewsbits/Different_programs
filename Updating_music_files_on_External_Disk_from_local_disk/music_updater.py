@@ -6,6 +6,7 @@ import usb_devices_partitions_displayer as usb_dev_prt_dsplr
 
 class External_Device_Music_Updater:
 	def __init__(self):
+		self.menu_buttons = {'e': 'exit from program', 's': 'select connected usb storage'} # TODO: create buttons for menu
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
 		self.selected_connected_usb_storage_partition = ''
@@ -16,13 +17,39 @@ class External_Device_Music_Updater:
 	def select_connected_external_USB_storage_device_partition(self):		
 		if self.external_usb_device_searcher.main():
 			self.external_usb_storage_partitions_searcher.find_usb_storages_mountpoints_by_disks()
-			self.show_connected_usb_storage_devs_and_partitions()
 
-			user_input = input('Select connected USB Storage Partition Mountpoint\n[press leftside number]:')
-			if user_input.isdigit():
-				user_input_number = int(user_input)
-		
-		# TODO: finish this method
+			while True:
+				self.show_connected_usb_storage_devs_and_partitions()
+				user_input = input('Select connected USB Storage Partition Mountpoint\n[press leftside number]:')
+				if user_input.isdigit():
+					user_input_number = int(user_input)
+					if user_input_number in self.external_usb_storage_partitions_searcher.all_partitions_numbers:
+						self.selected_connected_usb_storage_partition = self.get_selected_partition_mountpoint(user_input_number)
+						print(f'You selected partition with mountpoint: {self.selected_connected_usb_storage_partition}')
+						user_answer = input('Are you agree with it[y/n]?: ')
+						if user_answer == 'y':
+							print('OK.')
+							return True
+					else:
+						print('Wrong partition number! Try again.')
+
+	def get_selected_partition_mountpoint(self, partition_number: int):
+		partitions_by_numbers = self.get_partitions_by_numbers()
+		print(partitions_by_numbers)
+
+		for number_and_partition in partitions_by_numbers:
+			if number_and_partition['number'] == partition_number:
+				return number_and_partition['mountpoint']
+		return False
+	
+	def get_partitions_by_numbers(self):
+		usb_storage_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()
+		partitions_by_numbers = []
+		for usb_storage_disk in usb_storage_partitions_by_disks:
+			disk_partitions_by_numbers = list(usb_storage_disk.values())[0]
+			partitions_by_numbers += disk_partitions_by_numbers
+
+		return partitions_by_numbers
 
 	def show_connected_usb_storage_devs_and_partitions(self):
 		connected_usb_storage_devices = self.external_usb_device_searcher.get_connected_usb_storage_devices()
@@ -34,6 +61,9 @@ class External_Device_Music_Updater:
 		usb_devices_partitions_displayer.compose_usb_storage_devices_with_partitions()
 		
 		usb_devices_partitions_displayer.show_info_about_usb_storages_partitions()
+
+	def show_menu(self):
+		pass
 
 if __name__ == '__main__':
 	music_updater = External_Device_Music_Updater()
