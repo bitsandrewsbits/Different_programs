@@ -48,7 +48,6 @@ class Partition_Music_Dir_Searcher:
 		# searching algorithm
 		self.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
 		
-		self.show_search_nonzero_MP3_dirs_result()
 		self.define_dir_with_biggest_amount_of_MP3_files()
 		self.show_dir_with_biggest_amount_of_MP3_files()
 		return True

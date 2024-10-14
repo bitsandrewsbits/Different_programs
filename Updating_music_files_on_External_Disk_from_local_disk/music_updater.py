@@ -1,5 +1,6 @@
 # main class that implements all music updating steps
 
+import disk_partition_music_dir_searcher as music_dir_srchr
 import external_device_searcher as usb_srchr
 import external_usb_storage_partitions_searcher as usb_prt_srchr
 import usb_devices_partitions_displayer as usb_dev_prt_dsplr
@@ -7,14 +8,26 @@ import usb_devices_partitions_displayer as usb_dev_prt_dsplr
 class External_Device_Music_Updater:
 	def __init__(self):
 		self.menu_buttons = {'e': 'exit from program', 's': 'select connected usb storage'} # TODO: create buttons for menu
+		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
 		self.selected_connected_usb_storage_partition = ''
+		self.found_music_dir_on_selected_local_disk_partition = ''
+
+	def main(self):
+		pass
 
 	def update_music_on_selected_usb_storage_device(self):
 		pass
 
-	def select_connected_external_USB_storage_device_partition(self):		
+	def define_music_dir_abs_path_on_local_partition(self):
+		if self.music_dir_searcher.main():
+			self.found_music_dir_on_selected_local_disk_partition = self.music_dir_searcher.get_partition_music_dir_abs_path()
+			return True
+		else:
+			return False
+
+	def select_connected_external_USB_storage_device_partition(self):
 		if self.external_usb_device_searcher.main():
 			self.external_usb_storage_partitions_searcher.find_usb_storages_mountpoints_by_disks()
 
