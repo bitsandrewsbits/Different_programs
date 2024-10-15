@@ -36,14 +36,15 @@ class Partition_Music_Dir_Searcher:
 		self.search_to_up = False
 		self.abs_dir_path_with_biggest_amount_of_MP3_files = ()
 
-	def main(self):
+	def main(self, target_partition_abs_path = ''):
 		self.show_operation_system_type()
 		self.find_all_partitions_mountpoints_on_local_disk()
 		self.get_log_in_user_to_Linux_system()
 		self.show_partitions_info_for_user()
-		self.choose_local_disk_partition_for_searching()
-		target_system_path = self.get_target_system_path_for_searching_music_folder()
-		print(target_system_path)
+		if target_partition_abs_path == '':
+			self.choose_local_disk_partition_for_searching()
+			target_system_path = self.get_target_system_path_for_searching_music_folder()
+			print(target_system_path)
 
 		# searching algorithm
 		self.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)

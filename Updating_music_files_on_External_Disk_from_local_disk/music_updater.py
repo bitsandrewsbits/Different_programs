@@ -7,20 +7,26 @@ import usb_devices_partitions_displayer as usb_dev_prt_dsplr
 
 class External_Device_Music_Updater:
 	def __init__(self):
-		self.menu_buttons = {'e': 'exit from program', 's': 'select connected usb storage'} # TODO: create buttons for menu
+		self.menu_buttons = {'e': 'exit from program', 's': 'select connected usb storage'} # I will finish it in future commits
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
 		self.selected_connected_usb_storage_partition = ''
 		self.found_music_dir_on_selected_local_disk_partition = ''
+		self.found_music_dir_on_selected_usb_storage_partition = ''
 
 	def main(self):
 		pass
 
 	def update_music_on_selected_usb_storage_device(self):
-		pass
+		self.define_music_dir_abs_path_on_selected_local_partition()
+		self.select_connected_external_USB_storage_device_partition()
+		self.define_music_dir_abs_path_on_selected_usb_storage_partition(selected_connected_usb_storage_partition)
 
-	def define_music_dir_abs_path_on_local_partition(self):
+		# TODO: think how to create further process: defining absent music files in usb storage partition, 
+		# but they exist in local disk partition.
+
+	def define_music_dir_abs_path_on_selected_local_partition(self):
 		if self.music_dir_searcher.main():
 			self.found_music_dir_on_selected_local_disk_partition = self.music_dir_searcher.get_partition_music_dir_abs_path()
 			return True
@@ -45,6 +51,13 @@ class External_Device_Music_Updater:
 							return True
 					else:
 						print('Wrong partition number! Try again.')
+
+	def define_music_dir_abs_path_on_selected_usb_storage_partition(self, selected_usb_partition: str):
+		if self.music_dir_searcher.main(selected_usb_partition):
+			self.found_music_dir_on_selected_usb_storage_partition = self.music_dir_searcher.get_partition_music_dir_abs_path()
+			return True
+		else:
+			return False
 
 	def get_selected_partition_mountpoint(self, partition_number: int):
 		partitions_by_numbers = self.get_partitions_by_numbers()
