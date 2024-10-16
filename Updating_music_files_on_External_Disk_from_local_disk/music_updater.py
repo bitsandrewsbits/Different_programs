@@ -4,6 +4,7 @@ import disk_partition_music_dir_searcher as music_dir_srchr
 import external_device_searcher as usb_srchr
 import external_usb_storage_partitions_searcher as usb_prt_srchr
 import usb_devices_partitions_displayer as usb_dev_prt_dsplr
+import os
 
 class External_Device_Music_Updater:
 	def __init__(self):
@@ -14,6 +15,8 @@ class External_Device_Music_Updater:
 		self.selected_connected_usb_storage_partition = ''
 		self.found_music_dir_on_selected_local_disk_partition = ''
 		self.found_music_dir_on_selected_usb_storage_partition = ''
+		self.mp3_filenames_in_local_partition_music_dir = []
+		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 
 	def main(self):
 		pass
@@ -25,6 +28,12 @@ class External_Device_Music_Updater:
 
 		# TODO: think how to create further process: defining absent music files in usb storage partition, 
 		# but they exist in local disk partition.
+
+	def define_filenames_in_local_partition_music_dir(self, abs_path: str):
+		self.mp3_filenames_in_local_partition_music_dir = os.listdir(abs_path)
+
+	def define_filenames_in_selected_usb_partition_music_dir(self, abs_path: str):
+		self.mp3_filenames_in_selected_usb_partition_music_dir = os.listdir(abs_path)
 
 	def define_music_dir_abs_path_on_selected_local_partition(self):
 		if self.music_dir_searcher.main():
