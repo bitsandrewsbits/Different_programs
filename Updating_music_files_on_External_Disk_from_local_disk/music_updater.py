@@ -17,6 +17,7 @@ class External_Device_Music_Updater:
 		self.found_music_dir_on_selected_usb_storage_partition = ''
 		self.mp3_filenames_in_local_partition_music_dir = []
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
+		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 
 	def main(self):
 		pass
@@ -28,6 +29,12 @@ class External_Device_Music_Updater:
 
 		# TODO: think how to create further process: defining absent music files in usb storage partition, 
 		# but they exist in local disk partition.
+
+	def define_new_mp3_files_for_copying_into_usb_music_dir(self):
+		for local_music_dir_mp3_file in self.mp3_filenames_in_local_partition_music_dir:
+			if local_music_dir_mp3_file not in self.mp3_filenames_in_selected_usb_partition_music_dir:
+				self.new_mp3_files_for_copying_to_usb_storage_music_dir.append(local_music_dir_mp3_file)
+		return True
 
 	def define_filenames_in_local_partition_music_dir(self, abs_path: str):
 		self.mp3_filenames_in_local_partition_music_dir = os.listdir(abs_path)
