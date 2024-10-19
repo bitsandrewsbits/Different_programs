@@ -26,9 +26,18 @@ class External_Device_Music_Updater:
 		self.define_music_dir_abs_path_on_selected_local_partition()
 		self.select_connected_external_USB_storage_device_partition()
 		self.define_music_dir_abs_path_on_selected_usb_storage_partition(selected_connected_usb_storage_partition)
+		self.define_new_mp3_files_for_copying_into_usb_music_dir()
+		self.show_new_mp3_files_for_usb_storage_music_dir()
 
-		# TODO: think how to create further process: defining absent music files in usb storage partition, 
-		# but they exist in local disk partition.
+	def copy_new_mp3_files_to_selected_usb_partition(self):
+		pass
+
+	def show_new_mp3_files_for_usb_storage_music_dir(self):
+		print('[INFO] Found new MP3 files for selected USB storage partition:')
+		for i in range(len(self.mp3_filenames_in_local_partition_music_dir)):
+			print(f'#{i + 1} - {self.mp3_filenames_in_local_partition_music_dir[i]}')
+		print()
+		return True
 
 	def define_new_mp3_files_for_copying_into_usb_music_dir(self):
 		for local_music_dir_mp3_file in self.mp3_filenames_in_local_partition_music_dir:
