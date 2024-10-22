@@ -29,7 +29,16 @@ class External_Device_Music_Updater:
 		self.define_new_mp3_files_for_copying_into_usb_music_dir()
 		self.show_new_mp3_files_for_usb_storage_music_dir()
 
-	def copy_new_mp3_files_to_selected_usb_partition(self):
+	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
+		pass
+
+	def music_dir_is_absent_on_selected_usb_partition(self):
+		if self.found_music_dir_on_selected_usb_storage_partition == '':
+			return True
+		else:
+			return False
+
+	def create_music_dir_on_selected_usb_partition(self):
 		pass
 
 	def show_new_mp3_files_for_usb_storage_music_dir(self):
