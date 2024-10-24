@@ -12,7 +12,7 @@ class External_Device_Music_Updater:
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
-		self.selected_connected_usb_storage_partition = ''
+		self.selected_connected_usb_storage_partition_mountpoint = ''
 		self.found_music_dir_on_selected_local_disk_partition = ''
 		self.found_music_dir_on_selected_usb_storage_partition = ''
 		self.mp3_filenames_in_local_partition_music_dir = []
@@ -25,9 +25,14 @@ class External_Device_Music_Updater:
 	def update_music_on_selected_usb_storage_device(self):
 		self.define_music_dir_abs_path_on_selected_local_partition()
 		self.select_connected_external_USB_storage_device_partition()
-		self.define_music_dir_abs_path_on_selected_usb_storage_partition(selected_connected_usb_storage_partition)
+		self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
 		self.define_new_mp3_files_for_copying_into_usb_music_dir()
 		self.show_new_mp3_files_for_usb_storage_music_dir()
+
+		if self.music_dir_is_absent_on_selected_usb_partition():
+			print('[INFO] Music Dir was not found on selected usb storage partition.')
+			print('Creating Music Dir...')
+			self.create_music_dir_on_selected_usb_partition()
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		pass
@@ -39,7 +44,9 @@ class External_Device_Music_Updater:
 			return False
 
 	def create_music_dir_on_selected_usb_partition(self):
-		pass
+		os.mkdir(
+			self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
+		)
 
 	def show_new_mp3_files_for_usb_storage_music_dir(self):
 		print('[INFO] Found new MP3 files for selected USB storage partition:')
@@ -77,8 +84,8 @@ class External_Device_Music_Updater:
 				if user_input.isdigit():
 					user_input_number = int(user_input)
 					if user_input_number in self.external_usb_storage_partitions_searcher.all_partitions_numbers:
-						self.selected_connected_usb_storage_partition = self.get_selected_partition_mountpoint(user_input_number)
-						print(f'You selected partition with mountpoint: {self.selected_connected_usb_storage_partition}')
+						self.selected_connected_usb_storage_partition_mountpoint = self.get_selected_partition_mountpoint(user_input_number)
+						print(f'You selected partition with mountpoint: {self.selected_connected_usb_storage_partition_mountpoint}')
 						user_answer = input('Are you agree with it[y/n]?: ')
 						if user_answer == 'y':
 							print('OK.')
@@ -128,4 +135,4 @@ class External_Device_Music_Updater:
 if __name__ == '__main__':
 	music_updater = External_Device_Music_Updater()
 
-	music_updater.select_connected_external_USB_storage_device_partition()
+	music_updater.update_music_on_selected_usb_storage_device()
