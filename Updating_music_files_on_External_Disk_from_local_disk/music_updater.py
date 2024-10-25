@@ -4,6 +4,7 @@ import disk_partition_music_dir_searcher as music_dir_srchr
 import external_device_searcher as usb_srchr
 import external_usb_storage_partitions_searcher as usb_prt_srchr
 import usb_devices_partitions_displayer as usb_dev_prt_dsplr
+import additional_functions as add_fns
 import os
 
 class External_Device_Music_Updater:
@@ -29,7 +30,8 @@ class External_Device_Music_Updater:
 		self.define_new_mp3_files_for_copying_into_usb_music_dir()
 		self.show_new_mp3_files_for_usb_storage_music_dir()
 
-		if self.music_dir_is_absent_on_selected_usb_partition():
+		if self.music_dir_is_absent_on_selected_usb_partition() and \
+		not self.created_usb_partition_music_dir_by_program_is_exist():
 			print('[INFO] Music Dir was not found on selected usb storage partition.')
 			print('Creating Music Dir...')
 			self.create_music_dir_on_selected_usb_partition()
@@ -44,9 +46,20 @@ class External_Device_Music_Updater:
 			return False
 
 	def create_music_dir_on_selected_usb_partition(self):
+		self.found_music_dir_on_selected_usb_storage_partition = \
+		self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
 		os.mkdir(
-			self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
+			self.found_music_dir_on_selected_usb_storage_partition
 		)
+
+	def created_usb_partition_music_dir_by_program_is_exist(self):
+		partition_dirs_list = add_fns.get_only_directories_in_dir(
+			self.selected_connected_usb_storage_partition_mountpoint
+		)
+		return 'Music_Dir' in partition_dirs_list
+
+	def set_new_usb_partition_music_dir(self, new_usb_part_mp3_dir_path: str):
+		self.found_music_dir_on_selected_usb_storage_partition = new_usb_part_mp3_dir_path
 
 	def show_new_mp3_files_for_usb_storage_music_dir(self):
 		print('[INFO] Found new MP3 files for selected USB storage partition:')
