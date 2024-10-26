@@ -43,11 +43,11 @@ class Partition_Music_Dir_Searcher:
 		self.show_partitions_info_for_user()
 		if target_partition_abs_path == '':
 			self.choose_local_disk_partition_for_searching()
-			target_system_path = self.get_target_system_path_for_searching_music_folder()
-			print(target_system_path)
+			target_partition_abs_path = self.get_target_system_path_for_searching_music_folder()
+			print(target_partition_abs_path)
 
 		# searching algorithm
-		self.search_nonzero_MP3_dirs_in_partition_filesystem(target_system_path)
+		self.search_nonzero_MP3_dirs_in_partition_filesystem(target_partition_abs_path)
 		
 		self.define_dir_with_biggest_amount_of_MP3_files()
 		self.show_dir_with_biggest_amount_of_MP3_files()
