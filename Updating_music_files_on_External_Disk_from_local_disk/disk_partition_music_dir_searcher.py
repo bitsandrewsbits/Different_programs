@@ -28,7 +28,7 @@ class Partition_Music_Dir_Searcher:
 		self.disk_partitions_mountpoints = []
 		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
 		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
-		self.target_system_path = ''
+		self.selected_partition_abs_path = ''
 		self.current_login_user = self.define_log_in_user_to_Linux_system()
 		self.current_search_dir_level = 0
 		self.current_search_abs_dir_path = ''
@@ -37,21 +37,40 @@ class Partition_Music_Dir_Searcher:
 		self.abs_dir_path_with_biggest_amount_of_MP3_files = ()
 
 	def main(self, target_partition_abs_path = ''):
+		self.reset_all_paramaters_for_new_search()
+
+		self.selected_partition_abs_path = target_partition_abs_path
 		self.show_operation_system_type()
 		self.find_all_partitions_mountpoints_on_local_disk()
 		self.get_log_in_user_to_Linux_system()
 		self.show_partitions_info_for_user()
 		if target_partition_abs_path == '':
 			self.choose_local_disk_partition_for_searching()
-			target_partition_abs_path = self.get_target_system_path_for_searching_music_folder()
-			print(target_partition_abs_path)
+			self.selected_partition_abs_path = self.get_selected_partition_abs_path_for_searching_music_folder()
+			print(self.selected_partition_abs_path)
 
 		# searching algorithm
-		self.search_nonzero_MP3_dirs_in_partition_filesystem(target_partition_abs_path)
+		self.search_nonzero_MP3_dirs_in_partition_filesystem(self.selected_partition_abs_path)
 		
-		self.define_dir_with_biggest_amount_of_MP3_files()
-		self.show_dir_with_biggest_amount_of_MP3_files()
+		if self.dirs_with_nonzero_amount_of_MP3_files != {}:
+			self.define_dir_with_biggest_amount_of_MP3_files()
+			self.show_dir_with_biggest_amount_of_MP3_files()
+		else:
+			print('[INFO] Dirs with MP3 files was not found on selected usb storage partition.')
+			print('[INFO] It will be created in the next stages.')
+			return False
 		return True
+
+	def reset_all_paramaters_for_new_search(self):
+		self.disk_partitions_mountpoints = []
+		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
+		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
+		self.selected_partition_abs_path = ''
+		self.current_search_dir_level = 0
+		self.current_search_abs_dir_path = ''
+		self.search_to_bottom = True
+		self.search_to_up = False
+		self.abs_dir_path_with_biggest_amount_of_MP3_files = ()
 
 	def get_partition_music_dir_abs_path(self):
 		return self.abs_dir_path_with_biggest_amount_of_MP3_files[0]
@@ -71,7 +90,7 @@ class Partition_Music_Dir_Searcher:
 			if user_input.isdigit():
 				user_input_number = int(user_input)
 				if user_input_number >= 0 and user_input_number < len(self.disk_partitions_mountpoints):
-					self.target_system_path = self.disk_partitions_mountpoints[user_input_number]
+					self.selected_partition_abs_path = self.disk_partitions_mountpoints[user_input_number]
 					break
 				else:
 					print('Input value out of range! Try again.')
@@ -86,8 +105,8 @@ class Partition_Music_Dir_Searcher:
 
 		print()
 
-	def get_target_system_path_for_searching_music_folder(self):
-		return self.target_system_path
+	def get_selected_partition_abs_path_for_searching_music_folder(self):
+		return self.selected_partition_abs_path
 
 	def define_log_in_user_to_Linux_system(self):
 		return os.getlogin()
@@ -105,7 +124,7 @@ class Partition_Music_Dir_Searcher:
 				(abs_dir_path, biggest_amount_of_MP3_files)
 
 	def show_dir_with_biggest_amount_of_MP3_files(self):
-		print(f'[INFO] Defined music directory on partition mountpoint - {self.target_system_path}:')
+		print(f'[INFO] Defined music directory on partition mountpoint - {self.selected_partition_abs_path}:')
 		print(f'{self.abs_dir_path_with_biggest_amount_of_MP3_files[0]} - ', end = '')
 		print(f'{self.abs_dir_path_with_biggest_amount_of_MP3_files[1]} file(s)\n')
 
@@ -202,7 +221,7 @@ class Partition_Music_Dir_Searcher:
 			return True
 
 	def show_search_nonzero_MP3_dirs_result(self):
-		print(f'[INFO] Found nonzero-MP3 dirs in disk partition - {self.target_system_path}:')
+		print(f'[INFO] Found nonzero-MP3 dirs in disk partition - {self.selected_partition_abs_path}:')
 		for abs_mp3_dir_path in self.dirs_with_nonzero_amount_of_MP3_files:
 			number_of_MP3_files_in_dir = self.dirs_with_nonzero_amount_of_MP3_files[abs_mp3_dir_path]
 			print(f'{abs_mp3_dir_path}: {number_of_MP3_files_in_dir} file/s')
