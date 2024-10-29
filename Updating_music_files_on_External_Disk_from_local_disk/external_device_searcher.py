@@ -41,7 +41,6 @@ class External_Connected_USB_Disk_Devices_Linux_Searcher:
 					return True
 				else:
 					print('[INFO] External USB storage devices was not found.')
-					return False
 			else:
 				print('Exiting from searching USB storages.')
 				return True

@@ -27,6 +27,7 @@ class External_Device_Music_Updater:
 		self.define_music_dir_abs_path_on_selected_local_partition()
 		self.select_connected_external_USB_storage_device_partition()
 		self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
+		self.define_filenames_in_local_partition_music_dir()
 		self.define_new_mp3_files_for_copying_into_usb_music_dir()
 		self.show_new_mp3_files_for_usb_storage_music_dir()
 
@@ -35,6 +36,12 @@ class External_Device_Music_Updater:
 			print('[INFO] Music Dir was not found on selected usb storage partition.')
 			print('Creating Music Dir...')
 			self.create_music_dir_on_selected_usb_partition()
+		if self.found_music_dir_on_selected_usb_storage_partition == \
+		self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir':
+			self.set_new_usb_partition_music_dir(
+				self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
+			)
+		self.define_filenames_in_selected_usb_partition_music_dir()
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		pass
@@ -53,9 +60,10 @@ class External_Device_Music_Updater:
 		)
 
 	def created_usb_partition_music_dir_by_program_is_exist(self):
-		partition_dirs_list = add_fns.get_only_directories_in_dir(
+		partition_dirs_list = add_fns.get_filenames_in_dir(
 			self.selected_connected_usb_storage_partition_mountpoint
 		)
+		print(partition_dirs_list)
 		return 'Music_Dir' in partition_dirs_list
 
 	def set_new_usb_partition_music_dir(self, new_usb_part_mp3_dir_path: str):
@@ -74,11 +82,15 @@ class External_Device_Music_Updater:
 				self.new_mp3_files_for_copying_to_usb_storage_music_dir.append(local_music_dir_mp3_file)
 		return True
 
-	def define_filenames_in_local_partition_music_dir(self, abs_path: str):
-		self.mp3_filenames_in_local_partition_music_dir = os.listdir(abs_path)
+	def define_filenames_in_local_partition_music_dir(self):
+		self.mp3_filenames_in_local_partition_music_dir = os.listdir(
+			self.found_music_dir_on_selected_local_disk_partition
+		)
 
-	def define_filenames_in_selected_usb_partition_music_dir(self, abs_path: str):
-		self.mp3_filenames_in_selected_usb_partition_music_dir = os.listdir(abs_path)
+	def define_filenames_in_selected_usb_partition_music_dir(self):
+		self.mp3_filenames_in_selected_usb_partition_music_dir = os.listdir(
+			self.found_music_dir_on_selected_usb_storage_partition
+		)
 
 	def define_music_dir_abs_path_on_selected_local_partition(self):
 		if self.music_dir_searcher.main():
