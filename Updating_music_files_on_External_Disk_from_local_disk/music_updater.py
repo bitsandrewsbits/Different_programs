@@ -36,12 +36,20 @@ class External_Device_Music_Updater:
 			print('[INFO] Music Dir was not found on selected usb storage partition.')
 			print('Creating Music Dir...')
 			self.create_music_dir_on_selected_usb_partition()
-		if self.found_music_dir_on_selected_usb_storage_partition == \
-		self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir':
+		if self.found_music_dir_on_selected_usb_storage_partition == '':
+			print('[INFO] Music_Dir already created by program. But empty.')
 			self.set_new_usb_partition_music_dir(
 				self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
 			)
 		self.define_filenames_in_selected_usb_partition_music_dir()
+
+		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
+		if user_answer == 'y':
+			if self.copy_new_mp3_files_to_selected_usb_partition_music_dir():
+				print('[INFO] All new MP3 music files was successful copied into')
+				print('selected usb partition!')
+			else:
+				print('[INFO] Something wrong during copying process.')
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		pass
