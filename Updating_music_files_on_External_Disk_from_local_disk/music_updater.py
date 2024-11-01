@@ -52,7 +52,13 @@ class External_Device_Music_Updater:
 				print('[INFO] Something wrong during copying process.')
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
-		pass
+		print('Copying progess:')
+		for new_mp3_file in self.new_mp3_files_for_copying_to_usb_storage_music_dir:
+			os.system(f"cp {self.found_music_dir_on_selected_local_disk_partition}/{new_mp3_file} \
+						   {self.found_music_dir_on_selected_usb_storage_partition}")
+			print('#', end = '')
+		print()
+		return True
 
 	def music_dir_is_absent_on_selected_usb_partition(self):
 		if self.found_music_dir_on_selected_usb_storage_partition == '':
@@ -79,8 +85,8 @@ class External_Device_Music_Updater:
 
 	def show_new_mp3_files_for_usb_storage_music_dir(self):
 		print('[INFO] Found new MP3 files for selected USB storage partition:')
-		for i in range(len(self.mp3_filenames_in_local_partition_music_dir)):
-			print(f'#{i + 1} - {self.mp3_filenames_in_local_partition_music_dir[i]}')
+		for i in range(len(self.new_mp3_files_for_copying_to_usb_storage_music_dir)):
+			print(f'#{i + 1} - {self.new_mp3_files_for_copying_to_usb_storage_music_dir[i]}')
 		print()
 		return True
 
@@ -129,7 +135,9 @@ class External_Device_Music_Updater:
 	def define_music_dir_abs_path_on_selected_usb_storage_partition(self, selected_usb_partition: str):
 		if self.music_dir_searcher.main(selected_usb_partition):
 			self.found_music_dir_on_selected_usb_storage_partition = self.music_dir_searcher.get_partition_music_dir_abs_path()
-			return True
+			if self.found_music_dir_on_selected_usb_storage_partition != '':
+				print(f'[INFO] Found music dir on selected usb partition: {self.found_music_dir_on_selected_usb_storage_partition}')
+				return True
 		else:
 			return False
 
