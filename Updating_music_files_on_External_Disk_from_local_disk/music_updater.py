@@ -20,9 +20,6 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 
-	def main(self):
-		pass
-
 	def update_music_on_selected_usb_storage_device(self):
 		self.define_music_dir_abs_path_on_selected_local_partition()
 		self.select_connected_external_USB_storage_device_partition()
@@ -59,6 +56,9 @@ class External_Device_Music_Updater:
 			print('#', end = '')
 		print()
 		return True
+
+	def mp3_filename_has_whitespaces(self, mp3_filename: str):
+		return ' ' in mp3_filename
 
 	def music_dir_is_absent_on_selected_usb_partition(self):
 		if self.found_music_dir_on_selected_usb_storage_partition == '':
