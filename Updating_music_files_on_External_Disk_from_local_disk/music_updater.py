@@ -13,6 +13,7 @@ class External_Device_Music_Updater:
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
+		self.spec_symbols_for_cmd = [' ', '(', ')']
 		self.selected_connected_usb_storage_partition_mountpoint = ''
 		self.found_music_dir_on_selected_local_disk_partition = ''
 		self.found_music_dir_on_selected_usb_storage_partition = ''
@@ -51,14 +52,31 @@ class External_Device_Music_Updater:
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		print('Copying progess:')
 		for new_mp3_file in self.new_mp3_files_for_copying_to_usb_storage_music_dir:
+			if self.mp3_filename_has_spec_symbols(new_mp3_file):
+				new_mp3_file = self.get_transformed_filename_with_spec_symbols_for_terminal(new_mp3_file)
 			os.system(f"cp {self.found_music_dir_on_selected_local_disk_partition}/{new_mp3_file} \
 						   {self.found_music_dir_on_selected_usb_storage_partition}")
 			print('#', end = '')
 		print()
 		return True
 
-	def mp3_filename_has_whitespaces(self, mp3_filename: str):
-		return ' ' in mp3_filename
+	def mp3_filename_has_spec_symbols(self, mp3_filename: str):
+		for spec_symbol in self.spec_symbols_for_cmd:
+			if spec_symbol in mp3_filename:
+				return True
+		return False
+
+	def get_transformed_filename_with_spec_symbols_for_terminal(self, filename: str):
+		transformed_filename_for_terminal_cmd = ''
+
+		for i in range(len(filename)):
+			if filename[i] in self.spec_symbols_for_cmd:
+				transformed_filename_for_terminal_cmd += f"\\{filename[i]}"
+			else:
+				transformed_filename_for_terminal_cmd += filename[i]
+
+		print(transformed_filename_for_terminal_cmd)
+		return transformed_filename_for_terminal_cmd
 
 	def music_dir_is_absent_on_selected_usb_partition(self):
 		if self.found_music_dir_on_selected_usb_storage_partition == '':
