@@ -13,7 +13,7 @@ class External_Device_Music_Updater:
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
-		self.spec_symbols_for_cmd = [' ', '(', ')']
+		self.spec_symbols_for_cmd = [' ', '(', ')', '\'', '&']
 		self.selected_connected_usb_storage_partition_mountpoint = ''
 		self.found_music_dir_on_selected_local_disk_partition = ''
 		self.found_music_dir_on_selected_usb_storage_partition = ''
@@ -26,8 +26,6 @@ class External_Device_Music_Updater:
 		self.select_connected_external_USB_storage_device_partition()
 		self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
 		self.define_filenames_in_local_partition_music_dir()
-		self.define_new_mp3_files_for_copying_into_usb_music_dir()
-		self.show_new_mp3_files_for_usb_storage_music_dir()
 
 		if self.music_dir_is_absent_on_selected_usb_partition() and \
 		not self.created_usb_partition_music_dir_by_program_is_exist():
@@ -40,6 +38,8 @@ class External_Device_Music_Updater:
 				self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
 			)
 		self.define_filenames_in_selected_usb_partition_music_dir()
+		self.define_new_mp3_files_for_copying_into_usb_music_dir()
+		self.show_new_mp3_files_for_usb_storage_music_dir()
 
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
 		if user_answer == 'y':
