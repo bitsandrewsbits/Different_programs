@@ -22,24 +22,28 @@ class External_Device_Music_Updater:
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 
 	def update_music_on_selected_usb_storage_device(self):
-		self.define_music_dir_abs_path_on_selected_local_partition()
-		self.select_connected_external_USB_storage_device_partition()
-		self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
-		self.define_filenames_in_local_partition_music_dir()
+		self.program_welcome_and_discription()
+		user_answer = ''
+		# TODO: finish this method
+		while user_answer != 'e' and user_answer != 'E':
+			self.define_music_dir_abs_path_on_selected_local_partition()
+			self.select_connected_external_USB_storage_device_partition()
+			self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
+			self.define_filenames_in_local_partition_music_dir()
 
-		if self.music_dir_is_absent_on_selected_usb_partition() and \
-		not self.created_usb_partition_music_dir_by_program_is_exist():
-			print('[INFO] Music Dir was not found on selected usb storage partition.')
-			print('Creating Music Dir...')
-			self.create_music_dir_on_selected_usb_partition()
-		if self.found_music_dir_on_selected_usb_storage_partition == '':
-			print('[INFO] Music_Dir already created by program. But empty.')
-			self.set_new_usb_partition_music_dir(
-				self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
-			)
-		self.define_filenames_in_selected_usb_partition_music_dir()
-		self.define_new_mp3_files_for_copying_into_usb_music_dir()
-		self.show_new_mp3_files_for_usb_storage_music_dir()
+			if self.music_dir_is_absent_on_selected_usb_partition() and \
+			not self.created_usb_partition_music_dir_by_program_is_exist():
+				print('[INFO] Music Dir was not found on selected usb storage partition.')
+				print('Creating Music Dir...')
+				self.create_music_dir_on_selected_usb_partition()
+			if self.found_music_dir_on_selected_usb_storage_partition == '':
+				print('[INFO] Music_Dir already created by program. But empty.')
+				self.set_new_usb_partition_music_dir(
+					self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
+				)
+			self.define_filenames_in_selected_usb_partition_music_dir()
+			self.define_new_mp3_files_for_copying_into_usb_music_dir()
+			self.show_new_mp3_files_for_usb_storage_music_dir()
 
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
 		if user_answer == 'y':
@@ -48,6 +52,17 @@ class External_Device_Music_Updater:
 				print('selected usb partition!')
 			else:
 				print('[INFO] Something wrong during copying process.')
+
+	def program_welcome_and_discription(self):
+		print(f"{'=' * 30}SemiAutoMP3-Updater{'=' * 30}")
+		print('Welcome to AutoUpdater of MP3 files!')
+		print('It give ability to copy only new MP3 files from local disk dir')
+		print('to your connected USB storage device into your music directory')
+		print("If you don't have it, don't worry, it will be created during process.")
+		print('Enjoy it! And Wish your favourite music be always with you.')
+
+	def show_application_menu(self):
+		pass
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		print('Copying progess:')
