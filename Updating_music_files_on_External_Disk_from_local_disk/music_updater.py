@@ -62,7 +62,12 @@ class External_Device_Music_Updater:
 		print('Enjoy it! And Wish your favourite music be always with you.')
 
 	def show_application_menu(self):
-		pass
+		print('Menu:')
+		print('s - to start updating steps(default); seud - search usb device;')
+		print('sldp - select local disk partition for searching music dir')
+		print('sud - select usb device; sup - select usb partition')
+		print('dmd - define music dir on selected usb partition.')
+		print('e/E - to exit from application.')
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		print('Copying progess:')
