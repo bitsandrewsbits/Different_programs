@@ -9,7 +9,12 @@ import os
 
 class External_Device_Music_Updater:
 	def __init__(self):
-		self.menu_buttons = {'e': 'exit from program', 's': 'select connected usb storage'} # I will finish it in future commits
+		self.commands_menu = {'s': 'select connected usb storage', 'seud': self.show_connected_usb_storage_devs_and_partitions(),
+							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition(),
+							 'sudp': self.select_connected_external_USB_storage_device_partition(),
+							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition(
+							 	self.selected_connected_usb_storage_partition_mountpoint)
+							}
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
@@ -31,6 +36,7 @@ class External_Device_Music_Updater:
 			self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
 			self.define_filenames_in_local_partition_music_dir()
 
+			# TODO: maybe need to convert this 'if' to one method. think and create it.
 			if self.music_dir_is_absent_on_selected_usb_partition() and \
 			not self.created_usb_partition_music_dir_by_program_is_exist():
 				print('[INFO] Music Dir was not found on selected usb storage partition.')
@@ -61,12 +67,12 @@ class External_Device_Music_Updater:
 		print("If you don't have it, don't worry, it will be created during process.")
 		print('Enjoy it! And Wish your favourite music be always with you.')
 
-	def show_application_menu(self):
-		print('Menu:')
-		print('s - to start updating steps(default); seud - search usb device;')
-		print('sldp - select local disk partition for searching music dir')
-		print('sud - select usb device; sup - select usb partition')
-		print('dmd - define music dir on selected usb partition.')
+	def show_application_commands_menu(self):
+		print('App commands:')
+		print('s - to start updating steps(default); seud - show usb devices and partitions;')
+		print('sldp - select local disk partition and searching music dir in it.')
+		print('sudp - select usb device and select usb partition')
+		print('dumd - define music dir on selected usb partition.')
 		print('e/E - to exit from application.')
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
