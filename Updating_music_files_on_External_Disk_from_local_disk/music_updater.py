@@ -15,6 +15,16 @@ class External_Device_Music_Updater:
 							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition(
 							 	self.selected_connected_usb_storage_partition_mountpoint)
 							}
+		self.music_updating_stages = [self.define_music_dir_abs_path_on_selected_local_partition(),
+			self.select_connected_external_USB_storage_device_partition(),
+			self.define_music_dir_abs_path_on_selected_usb_storage_partition(
+				self.selected_connected_usb_storage_partition_mountpoint),
+			self.define_filenames_in_local_partition_music_dir(),
+			self.set_or_create_new_music_dir_on_usb_partition_if_its_empty_or_absent(),
+			self.define_filenames_in_selected_usb_partition_music_dir(),
+			self.define_new_mp3_files_for_copying_into_usb_music_dir(),
+			self.show_new_mp3_files_for_usb_storage_music_dir()
+		]
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
@@ -31,18 +41,12 @@ class External_Device_Music_Updater:
 		user_answer = ''
 		# TODO: finish this method
 		while user_answer != 'e' and user_answer != 'E':
-			self.define_music_dir_abs_path_on_selected_local_partition()
-			self.select_connected_external_USB_storage_device_partition()
-			self.define_music_dir_abs_path_on_selected_usb_storage_partition(self.selected_connected_usb_storage_partition_mountpoint)
-			self.define_filenames_in_local_partition_music_dir()
+			for stage in self.music_updating_stages:
+				stage
+				self.show_application_commands_menu()
 
-			# TODO: maybe need to convert this 'if' to one method. think and create it. - In process...
-			self.set_or_create_new_music_dir_on_usb_partition_if_its_empty_or_absent()
-
-			self.define_filenames_in_selected_usb_partition_music_dir()
-			self.define_new_mp3_files_for_copying_into_usb_music_dir()
-			self.show_new_mp3_files_for_usb_storage_music_dir()
-
+		# TODO: create separate method for user input answer
+		# (in general for all application, need to create separate class for this)
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
 		if user_answer == 'y':
 			if self.copy_new_mp3_files_to_selected_usb_partition_music_dir():
