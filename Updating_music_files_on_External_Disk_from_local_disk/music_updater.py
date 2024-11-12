@@ -9,22 +9,6 @@ import os
 
 class External_Device_Music_Updater:
 	def __init__(self):
-		self.commands_menu = {'s': 'select connected usb storage', 'seud': self.show_connected_usb_storage_devs_and_partitions(),
-							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition(),
-							 'sudp': self.select_connected_external_USB_storage_device_partition(),
-							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition(
-							 	self.selected_connected_usb_storage_partition_mountpoint)
-							}
-		self.music_updating_stages = [self.define_music_dir_abs_path_on_selected_local_partition(),
-			self.select_connected_external_USB_storage_device_partition(),
-			self.define_music_dir_abs_path_on_selected_usb_storage_partition(
-				self.selected_connected_usb_storage_partition_mountpoint),
-			self.define_filenames_in_local_partition_music_dir(),
-			self.set_or_create_new_music_dir_on_usb_partition_if_its_empty_or_absent(),
-			self.define_filenames_in_selected_usb_partition_music_dir(),
-			self.define_new_mp3_files_for_copying_into_usb_music_dir(),
-			self.show_new_mp3_files_for_usb_storage_music_dir()
-		]
 		self.music_dir_searcher = music_dir_srchr.Partition_Music_Dir_Searcher()
 		self.external_usb_device_searcher = usb_srchr.External_Connected_USB_Disk_Devices_Linux_Searcher()
 		self.external_usb_storage_partitions_searcher = usb_prt_srchr.External_USB_Storage_Partitions_Searcher()
@@ -35,18 +19,46 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_local_partition_music_dir = []
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
+		
+		# TODO: need to decide how to call this method only when they need. Not during initialization!
+		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
+							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
+							 'sudp': self.select_connected_external_USB_storage_device_partition,
+							 # 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition(
+							 # 	self.selected_connected_usb_storage_partition_mountpoint)
+							}
+
+		self.music_updating_stages = [self.define_music_dir_abs_path_on_selected_local_partition,
+			self.select_connected_external_USB_storage_device_partition,
+			self.define_music_dir_abs_path_on_selected_usb_storage_partition,
+			self.define_filenames_in_local_partition_music_dir,
+			self.set_or_create_new_music_dir_on_usb_partition_if_its_empty_or_absent,
+			self.define_filenames_in_selected_usb_partition_music_dir,
+			self.define_new_mp3_files_for_copying_into_usb_music_dir,
+			self.show_new_mp3_files_for_usb_storage_music_dir,
+			self.copying_new_mp3_files_into_selected_usb_partition
+		]
 
 	def update_music_on_selected_usb_storage_device(self):
 		self.program_welcome_and_discription()
 		user_answer = ''
-		# TODO: finish this method
+		# TODO: finish this method - In process
 		while user_answer != 'e' and user_answer != 'E':
 			for stage in self.music_updating_stages:
-				stage
+				stage()
 				self.show_application_commands_menu()
+				user_command = input('Enter your action[or any button if you just want to continue]: ')
+				if user_command == 'e' or user_command == 'E':
+					print('Bye')
+					break
+				elif user_command in self.application_commands.keys():
+					self.application_commands[user_command]
+				else:
+					print('Continue music updating process.')
 
-		# TODO: create separate method for user input answer
-		# (in general for all application, need to create separate class for this)
+	# TODO: create separate method for user input answer
+	# (in general for all application, need to create separate class for this)
+	def copying_new_mp3_files_into_selected_usb_partition(self):
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
 		if user_answer == 'y':
 			if self.copy_new_mp3_files_to_selected_usb_partition_music_dir():
@@ -58,14 +70,14 @@ class External_Device_Music_Updater:
 	def program_welcome_and_discription(self):
 		print(f"{'=' * 30}SemiAutoMP3-Updater{'=' * 30}")
 		print('Welcome to AutoUpdater of MP3 files!')
-		print('It give ability to copy only new MP3 files from local disk dir')
-		print('to your connected USB storage device into your music directory')
+		print('It gives ability to copy only new MP3 files from local disk dir')
+		print('to your connected USB storage device into your music directory.')
 		print("If you don't have it, don't worry, it will be created during process.")
 		print('Enjoy it! And Wish your favourite music be always with you.')
 
 	def show_application_commands_menu(self):
 		print('App commands:')
-		print('s - to start updating steps(default); seud - show usb devices and partitions;')
+		print('c - just continue updating stages; seud - show usb devices and partitions;')
 		print('sldp - select local disk partition and searching music dir in it.')
 		print('sudp - select usb device and select usb partition')
 		print('dumd - define music dir on selected usb partition.')
