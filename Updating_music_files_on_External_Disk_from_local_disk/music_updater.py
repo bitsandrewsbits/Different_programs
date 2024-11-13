@@ -20,12 +20,11 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 		
-		# TODO: need to decide how to call this method only when they need. Not during initialization!
+		# TODO: need to decide how to call this methods only when they need. Not during initialization!
 		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
 							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
 							 'sudp': self.select_connected_external_USB_storage_device_partition,
-							 # 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition(
-							 # 	self.selected_connected_usb_storage_partition_mountpoint)
+							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition
 							}
 
 		self.music_updating_stages = [self.define_music_dir_abs_path_on_selected_local_partition,
@@ -197,8 +196,8 @@ class External_Device_Music_Updater:
 					else:
 						print('Wrong partition number! Try again.')
 
-	def define_music_dir_abs_path_on_selected_usb_storage_partition(self, selected_usb_partition: str):
-		if self.music_dir_searcher.main(selected_usb_partition):
+	def define_music_dir_abs_path_on_selected_usb_storage_partition(self):
+		if self.music_dir_searcher.main(self.selected_connected_usb_storage_partition_mountpoint):
 			self.found_music_dir_on_selected_usb_storage_partition = self.music_dir_searcher.get_partition_music_dir_abs_path()
 			if self.found_music_dir_on_selected_usb_storage_partition != '':
 				print(f'[INFO] Found music dir on selected usb partition: {self.found_music_dir_on_selected_usb_storage_partition}')
