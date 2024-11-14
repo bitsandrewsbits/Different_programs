@@ -40,11 +40,10 @@ class External_Device_Music_Updater:
 
 	def update_music_on_selected_usb_storage_device(self):
 		self.program_welcome_and_discription()
-		user_answer = ''
+		user_command = ''
 		# TODO: finish this method - In process
-		while user_answer != 'e' and user_answer != 'E':
+		while user_command != 'e' and user_command != 'E':
 			for stage in self.music_updating_stages:
-				stage()
 				self.show_application_commands_menu()
 				user_command = input('Enter your action[or any button if you just want to continue]: ')
 				if user_command == 'e' or user_command == 'E':
@@ -54,6 +53,7 @@ class External_Device_Music_Updater:
 					self.application_commands[user_command]
 				else:
 					print('Continue music updating process.')
+					stage()
 
 	# TODO: create separate method for user input answer
 	# (in general for all application, need to create separate class for this)
