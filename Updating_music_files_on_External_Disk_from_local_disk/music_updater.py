@@ -20,7 +20,6 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 		
-		# TODO: need to decide how to call this methods only when they need. Not during initialization!
 		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
 							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
 							 'sudp': self.select_connected_external_USB_storage_device_partition,
@@ -41,7 +40,6 @@ class External_Device_Music_Updater:
 	def update_music_on_selected_usb_storage_device(self):
 		self.program_welcome_and_discription()
 		user_command = ''
-		# TODO: finish this method - In process
 		while user_command != 'e' and user_command != 'E':
 			for stage in self.music_updating_stages:
 				self.show_application_commands_menu()
@@ -55,8 +53,6 @@ class External_Device_Music_Updater:
 					print('Continue music updating process.')
 					stage()
 
-	# TODO: create separate method for user input answer
-	# (in general for all application, need to create separate class for this)
 	def copying_new_mp3_files_into_selected_usb_partition(self):
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
 		if user_answer == 'y':

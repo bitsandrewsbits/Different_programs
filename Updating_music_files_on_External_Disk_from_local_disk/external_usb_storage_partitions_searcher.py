@@ -79,6 +79,10 @@ class External_USB_Storage_Partitions_Searcher:
 
 		return bash_command_result_strs
 	
+	# TODO: think and create method(s) for getting information about free memory space(in bytes)
+	# in every found usb partition.
+	def define_free_memory_space_for_each_partition(self):
+		pass
 
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
