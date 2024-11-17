@@ -1,10 +1,10 @@
 # Class that searching all partitions of connected usb storage devices
-import re
 import subprocess as sp
 
 class External_USB_Storage_Partitions_Searcher:
 	def __init__(self, all_connected_usb_storage_devices = [], selected_usb_storage_device = {}):
 		self.lsblk_cmd = ["lsblk"]
+		self.df_cmd = ["df"]
 		self.usb_storage_devs_lsblk_start_str = 'sdb'
 
 		# data structure - [{'disk-1': [{'number': partition_number-1, 'mountpoint': 'abs_path_part-1'}, {}, ...]}, ...]}, {'disk-2': [...]}, ...]
@@ -60,7 +60,7 @@ class External_USB_Storage_Partitions_Searcher:
 		
 	def get_usb_storage_partitions_lsblk_output_strings(self):
 		usb_storages_partitions_strs = []
-		lsblk_output_strings = self.parse_output_lsblk_output_strings()
+		lsblk_output_strings = self.get_parse_command_output_strings(self.lsblk_cmd)
 		for i in range(len(lsblk_output_strings)):
 			if self.usb_storage_devs_lsblk_start_str in lsblk_output_strings[i]:
 				usb_storages_partitions_strs = lsblk_output_strings[i:]
@@ -69,26 +69,37 @@ class External_USB_Storage_Partitions_Searcher:
 		print(usb_storages_partitions_strs)
 		return usb_storages_partitions_strs
 
-	def parse_output_lsblk_output_strings(self):
-		lsblk_output_strings = self.get_output_from_lsblk_cmd().split('\n')
+	def get_parse_command_output_strings(self, linux_cmd: list):
+		lsblk_output_strings = self.get_output_from_cmd(linux_cmd).split('\n')
 		return lsblk_output_strings
 
-	def get_output_from_lsblk_cmd(self):
-		bash_command_output = sp.run(self.lsblk_cmd, capture_output = True, text = True)
+	def get_output_from_cmd(self, linux_cmd: list):
+		bash_command_output = sp.run(linux_cmd, capture_output = True, text = True)
 		bash_command_result_strs = bash_command_output.stdout.strip()
 
 		return bash_command_result_strs
 	
 	# TODO: think and create method(s) for getting information about free memory space(in bytes)
 	# in every found usb partition.
+	# I will use df command for get this info.
 	def define_free_memory_space_for_each_partition(self):
 		pass
+
+	def get_partition_free_space_in_bytes(self):
+		output_df_cmd_strings = self.get_parse_command_output_strings(self.df_cmd)
+		partitions_free_space = {}
+
+		for output_str in output_df_cmd_strings:
+			str_elements = output_str.split(' ')
+			partitions_free_space[str_elements[0]] = str_elements[3]
+		print('Result Partition Free Space:')
+		print(partitions_free_space)
 
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()
 
 	external_usb_storage_partitions_seacher.find_usb_storages_mountpoints_by_disks()
 
-
+	external_usb_storage_partitions_seacher.get_partition_free_space_in_bytes()
 
 
