@@ -1,5 +1,6 @@
 # Class that searching all partitions of connected usb storage devices
 import subprocess as sp
+import additional_functions as add_fns
 
 class External_USB_Storage_Partitions_Searcher:
 	def __init__(self, all_connected_usb_storage_devices = [], selected_usb_storage_device = {}):
@@ -90,10 +91,11 @@ class External_USB_Storage_Partitions_Searcher:
 		partitions_free_space = {}
 
 		for output_str in output_df_cmd_strings:
-			str_elements = output_str.split(' ')
+			str_elements = add_fns.get_string_elements_splitting_by_whitespace(output_str)
 			partitions_free_space[str_elements[0]] = str_elements[3]
 		print('Result Partition Free Space:')
 		print(partitions_free_space)
+		return partitions_free_space
 
 if __name__ == '__main__':
 	external_usb_storage_partitions_seacher = External_USB_Storage_Partitions_Searcher()

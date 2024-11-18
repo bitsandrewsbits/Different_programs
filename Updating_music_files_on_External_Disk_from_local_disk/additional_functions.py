@@ -109,3 +109,15 @@ def get_filenames_in_dir(abs_path_to_dir):
 		return os.listdir(abs_path_to_dir)
 	except Exception:
 		return 'error(permission denied)'
+
+def get_string_elements_splitting_by_whitespace(string: str):
+	result_elements = []
+	str_elements = string.split(' ')
+
+	result_elements = [result_elem for result_elem in str_elements if result_elem != '']
+
+	return result_elements
+
+if __name__ == '__main__':
+	test_str = "a    b bi c   8 d   =  98/2834"
+	print(get_string_elements_splitting_by_whitespace(test_str))
