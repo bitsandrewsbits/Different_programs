@@ -20,6 +20,7 @@ class External_USB_Storage_Partitions_Searcher:
 		for lsblk_str in target_lsblk_strings:
 			if self.lsblk_string_contain_usb_disk_Linux_name(lsblk_str):
 				print('Found external usb disk:', lsblk_str)
+				partition_number = 1
 				current_usb_disk_dev = {}
 				usb_disk_dev_name = self.get_usb_disk_from_lsblk_string(lsblk_str)
 				current_usb_disk_dev[usb_disk_dev_name] = []
@@ -81,18 +82,19 @@ class External_USB_Storage_Partitions_Searcher:
 		return bash_command_result_strs
 	
 	# TODO: think and create method(s) for getting information about free memory space(in bytes)
-	# in every found usb partition.
+	# in every found usb partition - In process...
 	# I will use df command for get this info.
-	def define_free_memory_space_for_each_partition(self):
+	def get_free_memory_for_partition(self, partition: str):
 		pass
 
-	def get_partition_free_space_in_bytes(self):
+	def get_all_partitions_free_memory_in_bytes(self):
 		output_df_cmd_strings = self.get_parse_command_output_strings(self.df_cmd)
 		partitions_free_space = {}
 
 		for output_str in output_df_cmd_strings:
 			str_elements = add_fns.get_string_elements_splitting_by_whitespace(output_str)
-			partitions_free_space[str_elements[0]] = str_elements[3]
+			if str_elements[0] != 'Filesystem':
+				partitions_free_space[str_elements[0]] = str_elements[3]
 		print('Result Partition Free Space:')
 		print(partitions_free_space)
 		return partitions_free_space
@@ -102,6 +104,6 @@ if __name__ == '__main__':
 
 	external_usb_storage_partitions_seacher.find_usb_storages_mountpoints_by_disks()
 
-	external_usb_storage_partitions_seacher.get_partition_free_space_in_bytes()
+	external_usb_storage_partitions_seacher.get_all_partitions_free_memory_in_bytes()
 
 
