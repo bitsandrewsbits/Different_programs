@@ -9,7 +9,8 @@ class External_USB_Storage_Partitions_Searcher:
 		self.df_cmd = ["df"]
 		self.usb_storage_devs_lsblk_start_str = 'sdb'
 
-		# data structure - [{'disk-1': [{'number': partition_number-1, 
+		# data structure - [{'disk-1': [{'unique_number_for_user': unique_partition_number-1,
+		# 								'usb_partition_number': usb_partition_number-1, 
 		# 								'mountpoint': 'abs_path_part-1', 
 		#								'free_memory': number_of_bytes}, 
 		#                    {}, ...]}, ...]}, {'disk-2': [...]}, ...]
@@ -24,10 +25,11 @@ class External_USB_Storage_Partitions_Searcher:
 
 		# Notice: maybe I need two different variables: unique number - for user choice,
 		# number - for every usb dev - from [1, N]
-		partition_number  = 1
+		unique_partition_number = 1
 		for lsblk_str in target_lsblk_strings:
 			if self.lsblk_string_contain_usb_disk_Linux_name(lsblk_str):
 				print('Found external usb disk:', lsblk_str)
+				usb_partition_number = 1
 				current_usb_disk_dev = {}
 				usb_disk_dev_name = self.get_usb_disk_from_lsblk_string(lsblk_str)
 				current_usb_disk_dev[usb_disk_dev_name] = []
@@ -38,13 +40,15 @@ class External_USB_Storage_Partitions_Searcher:
 				usb_disk_mountpoint = self.get_usb_disk_mountpoint_from_lsblk_string(lsblk_str)
 				print('Found external usb disk mountpoint:', usb_disk_mountpoint)
 				current_usb_disk_partition = {}
-				current_usb_disk_partition['number'] = partition_number
+				current_usb_disk_partition['unique_number_for_user'] = unique_partition_number
+				current_usb_disk_partition['usb_partition_number'] = usb_partition_number
 				current_usb_disk_partition['mountpoint'] = usb_disk_mountpoint
 				current_usb_disk_partition['free_memory'] = self.get_free_memory_for_partition(
-																usb_disk_dev_name, partition_number)
+																usb_disk_dev_name, usb_partition_number)
 				current_usb_disk_dev[usb_disk_dev_name].append(current_usb_disk_partition)
-				self.all_partitions_numbers.append(partition_number)
-				partition_number += 1
+				self.all_partitions_numbers.append(unique_partition_number)
+				usb_partition_number += 1
+				unique_partition_number += 1
 
 		print(self.all_partitions_of_all_connected_usb_storage_devs_by_disks)
 		return True
