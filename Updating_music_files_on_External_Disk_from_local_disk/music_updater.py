@@ -206,7 +206,7 @@ class External_Device_Music_Updater:
 		print(partitions_by_numbers)
 
 		for number_and_partition in partitions_by_numbers:
-			if number_and_partition['number'] == partition_number:
+			if number_and_partition['unique_number_for_user'] == partition_number:
 				return number_and_partition['mountpoint']
 		return False
 	
