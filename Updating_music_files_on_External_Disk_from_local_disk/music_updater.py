@@ -23,8 +23,10 @@ class External_Device_Music_Updater:
 		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
 							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
 							 'sudp': self.select_connected_external_USB_storage_device_partition,
-							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition
+							 'dumd': self.define_music_dir_abs_path_on_selected_usb_storage_partition,
+							 'cpmp3': self.copying_new_mp3_files_into_selected_usb_partition
 							}
+		self.user_possible_commands = ['e', 'E', 'seud', 'sldp', 'sudp', 'dumd', 'cpmp3']
 
 		self.music_updating_stages = [self.define_music_dir_abs_path_on_selected_local_partition,
 			self.select_connected_external_USB_storage_device_partition,
@@ -34,24 +36,27 @@ class External_Device_Music_Updater:
 			self.define_filenames_in_selected_usb_partition_music_dir,
 			self.define_new_mp3_files_for_copying_into_usb_music_dir,
 			self.show_new_mp3_files_for_usb_storage_music_dir,
-			self.copying_new_mp3_files_into_selected_usb_partition
 		]
 
 	def update_music_on_selected_usb_storage_device(self):
 		self.program_welcome_and_discription()
 		user_command = ''
 		while user_command != 'e' and user_command != 'E':
-			for stage in self.music_updating_stages:
+			self.preparation_stages_for_copying_new_mp3_files()
+			self.copying_new_mp3_files_into_selected_usb_partition()
+			while user_command not in self.user_possible_commands:
 				self.show_application_commands_menu()
-				user_command = input('Enter your action[or any button if you just want to continue]: ')
+				user_command = input('Enter your command: ')
 				if user_command == 'e' or user_command == 'E':
 					print('Bye')
-					break
 				elif user_command in self.application_commands.keys():
 					self.application_commands[user_command]
 				else:
-					print('Continue music updating process.')
-					stage()
+					print('Wrong command. try again.')
+
+	def preparation_stages_for_copying_new_mp3_files(self):
+		for stage in self.music_updating_stages:
+			stage()
 
 	def copying_new_mp3_files_into_selected_usb_partition(self):
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
@@ -61,6 +66,8 @@ class External_Device_Music_Updater:
 				print('selected usb partition!')
 			else:
 				print('[INFO] Something wrong during copying process.')
+		else:
+			return False
 
 	def program_welcome_and_discription(self):
 		print(f"{'=' * 30}SemiAutoMP3-Updater{'=' * 30}")
@@ -72,10 +79,11 @@ class External_Device_Music_Updater:
 
 	def show_application_commands_menu(self):
 		print('App commands:')
-		print('c - just continue updating stages; seud - show usb devices and partitions;')
+		print('seud - show usb devices and partitions;')
 		print('sldp - select local disk partition and searching music dir in it.')
 		print('sudp - select usb device and select usb partition')
 		print('dumd - define music dir on selected usb partition.')
+		print('cpmp3 - copy new MP3 files into selected usb partition.')
 		print('e/E - to exit from application.')
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
