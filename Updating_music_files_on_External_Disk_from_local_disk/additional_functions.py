@@ -118,6 +118,15 @@ def get_string_elements_splitting_by_whitespace(string: str):
 
 	return result_elements
 
+def get_file_size_in_bytes(file_abs_path: str):
+	file_status = os.stat(file_abs_path)
+	file_size_in_bytes = file_status.st_size
+	print('File size =', file_size_in_bytes)
+	return file_size_in_bytes
+
 if __name__ == '__main__':
-	test_str = "a    b bi c   8 d   =  98/2834"
-	print(get_string_elements_splitting_by_whitespace(test_str))
+	# test_str = "a    b bi c   8 d   =  98/2834"
+	# print(get_string_elements_splitting_by_whitespace(test_str))
+
+	test_abs_path = "insert/your/file/abs/path"
+	get_file_size_in_bytes(test_abs_path)

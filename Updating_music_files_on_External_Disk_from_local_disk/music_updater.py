@@ -19,6 +19,7 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_local_partition_music_dir = []
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
+		self.total_new_mp3_files_size_in_bytes = 0
 		
 		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
 							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
