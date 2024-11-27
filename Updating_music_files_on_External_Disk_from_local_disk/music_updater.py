@@ -98,6 +98,12 @@ class External_Device_Music_Updater:
 		print()
 		return True
 
+	def define_total_new_mp3_files_size_in_bytes(self):
+		for new_mp3_file in self.new_mp3_files_for_copying_to_usb_storage_music_dir:
+			current_mp3_file_abs_path = f"{self.found_music_dir_on_selected_local_disk_partition}/{new_mp3_file}"
+			self.total_new_mp3_files_size_in_bytes += add_fns.get_file_size_in_bytes(current_mp3_file_abs_path)
+		return True
+
 	def mp3_filename_has_spec_symbols(self, mp3_filename: str):
 		for spec_symbol in self.spec_symbols_for_cmd:
 			if spec_symbol in mp3_filename:
@@ -238,9 +244,6 @@ class External_Device_Music_Updater:
 		usb_devices_partitions_displayer.compose_usb_storage_devices_with_partitions()
 		
 		usb_devices_partitions_displayer.show_info_about_usb_storages_partitions()
-
-	def show_menu(self):
-		pass
 
 if __name__ == '__main__':
 	music_updater = External_Device_Music_Updater()
