@@ -20,6 +20,7 @@ class External_Device_Music_Updater:
 		self.mp3_filenames_in_selected_usb_partition_music_dir = []
 		self.new_mp3_files_for_copying_to_usb_storage_music_dir = []
 		self.total_new_mp3_files_size_in_bytes = 0
+		self.free_memory_on_selected_usb_partition_in_bytes = 0
 		
 		self.application_commands = {'seud': self.show_connected_usb_storage_devs_and_partitions,
 							 'sldp': self.define_music_dir_abs_path_on_selected_local_partition,
@@ -86,6 +87,11 @@ class External_Device_Music_Updater:
 		print('dumd - define music dir on selected usb partition.')
 		print('cpmp3 - copy new MP3 files into selected usb partition.')
 		print('e/E - to exit from application.')
+
+	def show_not_enough_memory_warning_message(self):
+		print('Warning! Not enough memory space for your selected USB partition!')
+		print('USB Partition Free Memory:', self.free_memory_on_selected_usb_partition_in_bytes)
+		print('Total size of new MP3 files for copying:', self.total_new_mp3_files_size_in_bytes)
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		print('Copying progess:')
@@ -224,6 +230,15 @@ class External_Device_Music_Updater:
 			if number_and_partition['unique_number_for_user'] == partition_number:
 				return number_and_partition['mountpoint']
 		return False
+
+	def define_selected_partition_free_memory_in_bytes(self, selected_partition_mountpoint: str):
+		usb_storage_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()
+		for usb_disk_partitions in usb_storage_partitions_by_disks.values():
+			for usb_disk_partition in usb_disk_partitions:
+				if usb_disk_partitions['mountpoint'] == selected_partition_mountpoint:
+					self.free_memory_on_selected_usb_partition_in_bytes = usb_disk_partitions['free_memory']
+					return True
+
 	
 	def get_partitions_by_numbers(self):
 		usb_storage_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()
