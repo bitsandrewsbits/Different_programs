@@ -45,7 +45,12 @@ class External_Device_Music_Updater:
 		user_command = ''
 		while user_command != 'e' and user_command != 'E':
 			self.preparation_stages_for_copying_new_mp3_files()
-			self.copying_new_mp3_files_into_selected_usb_partition()
+
+			if self.necessary_usb_memory_for_new_mp3_files_exists():
+				self.copying_new_mp3_files_into_selected_usb_partition()
+			else:
+				self.show_not_enough_memory_warning_message()
+			
 			while user_command not in self.user_possible_commands:
 				self.show_application_commands_menu()
 				user_command = input('Enter your command: ')
@@ -92,6 +97,10 @@ class External_Device_Music_Updater:
 		print('Warning! Not enough memory space for your selected USB partition!')
 		print('USB Partition Free Memory:', self.free_memory_on_selected_usb_partition_in_bytes)
 		print('Total size of new MP3 files for copying:', self.total_new_mp3_files_size_in_bytes)
+		print('Choose another usb partition, usb device. Or release free space on this partition.')
+
+	def necessary_usb_memory_for_new_mp3_files_exists(self):
+		return self.free_memory_on_selected_usb_partition_in_bytes > self.total_new_mp3_files_size_in_bytes
 
 	def copy_new_mp3_files_to_selected_usb_partition_music_dir(self):
 		print('Copying progess:')
