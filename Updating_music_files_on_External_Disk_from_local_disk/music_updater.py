@@ -38,6 +38,8 @@ class External_Device_Music_Updater:
 			self.define_filenames_in_selected_usb_partition_music_dir,
 			self.define_new_mp3_files_for_copying_into_usb_music_dir,
 			self.show_new_mp3_files_for_usb_storage_music_dir,
+			self.define_selected_partition_free_memory_in_bytes,
+			self.define_total_new_mp3_files_size_in_bytes
 		]
 
 	def update_music_on_selected_usb_storage_device(self):
@@ -95,9 +97,9 @@ class External_Device_Music_Updater:
 
 	def show_not_enough_memory_warning_message(self):
 		print('Warning! Not enough memory space for your selected USB partition!')
-		print('USB Partition Free Memory:', self.free_memory_on_selected_usb_partition_in_bytes)
-		print('Total size of new MP3 files for copying:', self.total_new_mp3_files_size_in_bytes)
-		print('Choose another usb partition, usb device. Or release free space on this partition.')
+		print(f'USB Partition Free Memory: {self.free_memory_on_selected_usb_partition_in_bytes} bytes')
+		print(f'Total size of new MP3 files for copying: {self.total_new_mp3_files_size_in_bytes} bytes')
+		print('Choose another usb partition, usb device. Or release free space on this partition.\n')
 
 	def necessary_usb_memory_for_new_mp3_files_exists(self):
 		return self.free_memory_on_selected_usb_partition_in_bytes > self.total_new_mp3_files_size_in_bytes
@@ -176,10 +178,10 @@ class External_Device_Music_Updater:
 		not self.created_usb_partition_music_dir_by_program_is_exist():
 			print('[INFO] Music Dir was not found on selected usb storage partition.')
 			print('Creating Music Dir...')
-			self.create_music_dir_on_selected_usb_partition()
 			self.set_new_usb_partition_music_dir(
 				self.selected_connected_usb_storage_partition_mountpoint + '/Music_Dir'
 			)
+			self.create_music_dir_on_selected_usb_partition()
 		elif self.found_music_dir_on_selected_usb_storage_partition == '':
 			print('[INFO] Music_Dir already created by program. But empty.')
 			self.set_new_usb_partition_music_dir(
@@ -240,14 +242,17 @@ class External_Device_Music_Updater:
 				return number_and_partition['mountpoint']
 		return False
 
-	def define_selected_partition_free_memory_in_bytes(self, selected_partition_mountpoint: str):
-		usb_storage_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()
-		for usb_disk_partitions in usb_storage_partitions_by_disks.values():
+	def define_selected_partition_free_memory_in_bytes(self):
+		usb_storages_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()
+		print(usb_storages_partitions_by_disks)
+		for usb_disk_and_partitions in usb_storages_partitions_by_disks:
+			usb_disk_dev = list(usb_disk_and_partitions.keys())[0]
+			usb_disk_partitions = usb_disk_and_partitions[usb_disk_dev]
+			print(usb_disk_partitions)
 			for usb_disk_partition in usb_disk_partitions:
-				if usb_disk_partitions['mountpoint'] == selected_partition_mountpoint:
-					self.free_memory_on_selected_usb_partition_in_bytes = usb_disk_partitions['free_memory']
+				if usb_disk_partition['mountpoint'] == self.selected_connected_usb_storage_partition_mountpoint:
+					self.free_memory_on_selected_usb_partition_in_bytes = int(usb_disk_partition['free_memory'])
 					return True
-
 	
 	def get_partitions_by_numbers(self):
 		usb_storage_partitions_by_disks = self.external_usb_storage_partitions_searcher.get_usb_storage_partition_mountpoints_by_disks()

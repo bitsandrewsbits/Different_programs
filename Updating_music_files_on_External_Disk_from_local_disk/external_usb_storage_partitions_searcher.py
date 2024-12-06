@@ -23,8 +23,6 @@ class External_USB_Storage_Partitions_Searcher:
 		target_lsblk_strings = self.get_usb_storage_partitions_lsblk_output_strings()
 		self.define_all_partitions_free_memory_in_bytes()
 
-		# Notice: maybe I need two different variables: unique number - for user choice,
-		# number - for every usb dev - from [1, N]
 		unique_partition_number = 1
 		for lsblk_str in target_lsblk_strings:
 			if self.lsblk_string_contain_usb_disk_Linux_name(lsblk_str):

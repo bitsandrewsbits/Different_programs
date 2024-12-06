@@ -121,7 +121,6 @@ def get_string_elements_splitting_by_whitespace(string: str):
 def get_file_size_in_bytes(file_abs_path: str):
 	file_status = os.stat(file_abs_path)
 	file_size_in_bytes = file_status.st_size
-	print('File size =', file_size_in_bytes)
 	return file_size_in_bytes
 
 if __name__ == '__main__':
