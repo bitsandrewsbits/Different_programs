@@ -25,7 +25,9 @@ from additional_functions import *
 class Partition_Music_Dir_Searcher:
 	def __init__(self):
 		self.operation_system_type = platform.system()
-		self.disk_partitions_mountpoints = []
+		self.excluded_moutpoints = ['/snap', '/var']
+		self.all_disk_partitions_mountpoints = []
+		self.user_data_disk_partitions_mountpoints = []
 		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
 		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
 		self.selected_partition_abs_path = ''
@@ -41,8 +43,9 @@ class Partition_Music_Dir_Searcher:
 
 		self.selected_partition_abs_path = target_partition_abs_path
 		self.show_operation_system_type()
-		self.find_all_partitions_mountpoints_on_local_disk()
 		self.get_log_in_user_to_Linux_system()
+		self.find_all_partitions_mountpoints_on_local_disk()
+		self.define_user_data_disk_partition_moutpoints()
 		self.show_partitions_info_for_user()
 		if target_partition_abs_path == '':
 			self.choose_local_disk_partition_for_searching()
@@ -62,7 +65,8 @@ class Partition_Music_Dir_Searcher:
 		return True
 
 	def reset_all_paramaters_for_new_search(self):
-		self.disk_partitions_mountpoints = []
+		self.all_disk_partitions_mountpoints = []
+		self.user_data_disk_partitions_mountpoints = []
 		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
 		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
 		self.selected_partition_abs_path = ''
@@ -81,7 +85,19 @@ class Partition_Music_Dir_Searcher:
 	def find_all_partitions_mountpoints_on_local_disk(self):
 		for disk_partition in psutil.disk_partitions():
 			# print('Root dir for partition:', disk_partition.mountpoint)
-			self.disk_partitions_mountpoints.append(disk_partition.mountpoint)
+			self.all_disk_partitions_mountpoints.append(disk_partition.mountpoint)
+
+	def define_user_data_disk_partition_moutpoints(self):
+		correct_mountpoint = True
+		for partition_mountpoint in self.all_disk_partitions_mountpoints:
+			for excluded_mountpoint in self.excluded_moutpoints:
+				if excluded_mountpoint in partition_mountpoint:
+					correct_mountpoint = False
+					break
+			if correct_mountpoint and partition_mountpoint not in self.user_data_disk_partitions_mountpoints:
+				self.user_data_disk_partitions_mountpoints.append(partition_mountpoint)
+			correct_mountpoint = True
+		return True
 
 	def choose_local_disk_partition_for_searching(self):
 		input_message = "Select one disk partition for searching [enter number from left column of list above]:"
@@ -89,8 +105,8 @@ class Partition_Music_Dir_Searcher:
 			user_input = input(input_message)
 			if user_input.isdigit():
 				user_input_number = int(user_input)
-				if user_input_number >= 0 and user_input_number < len(self.disk_partitions_mountpoints):
-					self.selected_partition_abs_path = self.disk_partitions_mountpoints[user_input_number]
+				if user_input_number >= 0 and user_input_number < len(self.user_data_disk_partitions_mountpoints):
+					self.selected_partition_abs_path = self.user_data_disk_partitions_mountpoints[user_input_number]
 					break
 				else:
 					print('Input value out of range! Try again.')
@@ -98,11 +114,10 @@ class Partition_Music_Dir_Searcher:
 				print('Wrong type of input value! Try again.')
 
 	def show_partitions_info_for_user(self):
-		print(f'[INFO] Found {len(self.disk_partitions_mountpoints)} disk partitions.')
+		print(f'[INFO] Found {len(self.user_data_disk_partitions_mountpoints)} disk partitions.')
 		print('Partitions:')
-		for i in range(len(self.disk_partitions_mountpoints)):
-			print(f'({i}) - {self.disk_partitions_mountpoints[i]}')
-
+		for i in range(len(self.user_data_disk_partitions_mountpoints)):
+			print(f'({i}) - {self.user_data_disk_partitions_mountpoints[i]}')
 		print()
 
 	def get_selected_partition_abs_path_for_searching_music_folder(self):
