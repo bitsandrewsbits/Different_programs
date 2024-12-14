@@ -50,7 +50,8 @@ class Partition_Music_Dir_Searcher:
 		self.define_user_data_disk_devices_moutpoints()
 		self.show_partitions_info_for_user()
 		if target_partition_abs_path == '':
-			self.choose_local_disk_partition_for_searching()
+			if self.choose_local_disk_partition_for_searching() == False:
+				return False
 			self.selected_partition_abs_path = self.get_selected_partition_abs_path_for_searching_music_folder()
 			print(self.selected_partition_abs_path)
 
@@ -103,7 +104,7 @@ class Partition_Music_Dir_Searcher:
 		return True
 
 	def choose_local_disk_partition_for_searching(self):
-		input_message = "Select one disk partition for searching [enter number from left column of list above]:"
+		input_message = "Select one disk partition for searching [enter number from left column of list above]\n[e - for exit]:"
 		while True:
 			user_input = input(input_message)
 			if user_input.isdigit():
@@ -114,6 +115,8 @@ class Partition_Music_Dir_Searcher:
 					break
 				else:
 					print('Input value out of range! Try again.')
+			elif user_input == 'e':
+				return False
 			else:
 				print('Wrong type of input value! Try again.')
 

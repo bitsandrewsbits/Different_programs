@@ -46,8 +46,10 @@ class External_Device_Music_Updater:
 		self.program_welcome_and_discription()
 		user_command = ''
 		while user_command != 'e' and user_command != 'E':
-			self.preparation_stages_for_copying_new_mp3_files()
-
+			if self.preparation_stages_for_copying_new_mp3_files() == False:
+				print('Bye.')
+				break
+				
 			if self.necessary_usb_memory_for_new_mp3_files_exists():
 				self.copying_new_mp3_files_into_selected_usb_partition()
 			else:
@@ -65,7 +67,8 @@ class External_Device_Music_Updater:
 
 	def preparation_stages_for_copying_new_mp3_files(self):
 		for stage in self.music_updating_stages:
-			stage()
+			if stage() == False:
+				return False
 
 	def copying_new_mp3_files_into_selected_usb_partition(self):
 		user_answer = input('Copy new MP3 files into selected usb partition?[y/n]:')
