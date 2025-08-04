@@ -27,6 +27,8 @@ class Partition_Music_Dir_Searcher:
 	def __init__(self):
 		self.operation_system_type = platform.system()
 		self.excluded_moutpoints = ['/snap', '/var']
+		self.selected_partition_root_dir_abs_pathes_by_numbers = {}
+		self.excluded_partition_root_dirs_from_searching = []
 		self.disk_partitions_regex = r"/dev/sda[1-9]" # so I think it works if local HDD is only one.
 		self.all_disk_devices_mountpoints = {}
 		self.user_data_disk_devices_mountpoints = {}
@@ -112,6 +114,7 @@ class Partition_Music_Dir_Searcher:
 				if user_input_number >= 0 and user_input_number < len(self.user_data_disk_devices_mountpoints):
 					disk_partitions_mountpoints = list(self.user_data_disk_devices_mountpoints.values())
 					self.selected_partition_abs_path = disk_partitions_mountpoints[user_input_number]
+					self.define_selected_partition_root_dir_abs_pathes_by_numbers()
 					break
 				else:
 					print('Input value out of range! Try again.')
@@ -119,6 +122,11 @@ class Partition_Music_Dir_Searcher:
 				return False
 			else:
 				print('Wrong type of input value! Try again.')
+
+	def define_selected_partition_root_dir_abs_pathes_by_numbers(self):
+		partition_root_dirs = get_only_directories_in_dir(self.selected_partition_abs_path)
+		for (i, root_dir) in enumerate(partition_root_dirs, 1):
+			self.selected_partition_root_dir_abs_pathes_by_numbers[i] = root_dir
 
 	def show_partitions_info_for_user(self):
 		print(f'[INFO] Found {len(self.user_data_disk_devices_mountpoints)} disk partitions.')
