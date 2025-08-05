@@ -111,12 +111,14 @@ def get_filenames_in_dir(abs_path_to_dir):
 		return 'error(permission denied)'
 
 def get_string_elements_splitting_by_whitespace(string: str):
-	result_elements = []
 	str_elements = string.split(' ')
-
 	result_elements = [result_elem for result_elem in str_elements if result_elem != '']
 
 	return result_elements
+
+def get_last_dir_file_name_from_abs_path(dir_abs_path: str):
+	dir_abs_path_parts = dir_abs_path.split('/')
+	return dir_abs_path_parts[-1]
 
 def get_file_size_in_bytes(file_abs_path: str):
 	file_status = os.stat(file_abs_path)
