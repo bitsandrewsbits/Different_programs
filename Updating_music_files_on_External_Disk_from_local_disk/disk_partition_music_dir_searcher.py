@@ -57,6 +57,7 @@ class Partition_Music_Dir_Searcher:
 			self.selected_partition_abs_path = self.get_selected_partition_abs_path_for_searching_music_folder()
 			print(self.selected_partition_abs_path)
 
+		self.show_selected_partition_root_dirnames_by_numbers()
 		# searching algorithm
 		self.search_nonzero_MP3_dirs_in_partition_filesystem(self.selected_partition_abs_path)
 		
@@ -127,6 +128,18 @@ class Partition_Music_Dir_Searcher:
 		partition_root_dirs = get_only_directories_in_dir(self.selected_partition_abs_path)
 		for (i, root_dir) in enumerate(partition_root_dirs, 1):
 			self.selected_partition_root_dir_abs_pathes_by_numbers[i] = root_dir
+
+	def show_selected_partition_root_dirnames_by_numbers(self):
+		print("Choose Partition Root Dirs for Excluding from Searching:")
+		for root_dir_number in self.selected_partition_root_dir_abs_pathes_by_numbers:
+			dirname = get_last_dir_file_name_from_abs_path(
+				self.selected_partition_root_dir_abs_pathes_by_numbers[root_dir_number]
+			)
+			print(f"({root_dir_number}) - {dirname}")
+
+	# TODO: create
+	def get_user_excluded_dirs_answer(self):
+		pass
 
 	def show_partitions_info_for_user(self):
 		print(f'[INFO] Found {len(self.user_data_disk_devices_mountpoints)} disk partitions.')
