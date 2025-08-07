@@ -28,7 +28,7 @@ class Partition_Music_Dir_Searcher:
 		self.operation_system_type = platform.system()
 		self.excluded_moutpoints = ['/snap', '/var']
 		self.selected_partition_root_dir_abs_pathes_by_numbers = {}
-		self.excluded_partition_root_dirs_from_searching = []
+		self.excluded_partition_root_dirs_abs_pathes_from_searching = []
 		self.disk_partitions_regex = r"/dev/sda[1-9]" # so I think it works if local HDD is only one.
 		self.all_disk_devices_mountpoints = {}
 		self.user_data_disk_devices_mountpoints = {}
@@ -57,7 +57,12 @@ class Partition_Music_Dir_Searcher:
 			self.selected_partition_abs_path = self.get_selected_partition_abs_path_for_searching_music_folder()
 			print(self.selected_partition_abs_path)
 
-		self.show_selected_partition_root_dirnames_by_numbers()
+		while True:
+			self.show_selected_partition_root_dirnames_by_numbers()
+			if self.define_user_excluded_dirs_abs_pathes():
+				break
+		return True # only interrupt for testing!
+		
 		# searching algorithm
 		self.search_nonzero_MP3_dirs_in_partition_filesystem(self.selected_partition_abs_path)
 		
@@ -137,9 +142,47 @@ class Partition_Music_Dir_Searcher:
 			)
 			print(f"({root_dir_number}) - {dirname}")
 
-	# TODO: create
-	def get_user_excluded_dirs_answer(self):
-		pass
+	def define_user_excluded_dirs_abs_pathes(self):
+		while True:
+			user_selected_dirs_numbers = input(
+				"Select number of dir for excluding from searching\nFor multiple choise, numbers via whitespace:"
+			)
+			if user_selected_dirs_numbers == 'e':
+				return False
+			user_answer_elements = get_string_elements_splitting_by_whitespace(user_selected_dirs_numbers)
+			if ''.join(user_answer_elements).isdigit():
+				user_dirs_numbers = set([int(number) for number in user_answer_elements])
+				if self.user_input_dirs_numbers_correct(user_dirs_numbers):
+					for number in user_dirs_numbers:
+						self.excluded_partition_root_dirs_abs_pathes_from_searching.append(
+							self.selected_partition_root_dir_abs_pathes_by_numbers[number]
+						)
+					while True:
+						print('Your selected excluded root dirs:')
+						for dir_abs_path in self.excluded_partition_root_dirs_abs_pathes_from_searching:
+							dirname = get_last_dir_file_name_from_abs_path(dir_abs_path)
+							print(dirname)
+						print('-' * 30)
+						user_acceptance = input("Are you agree with selected excluded dirs?[y/n]: ")
+						if user_acceptance == 'y':
+							return True
+						elif user_acceptance == 'n':
+							self.excluded_partition_root_dirs_abs_pathes_from_searching = []
+							break
+						else:
+							print('Wrong acceptence answer option! Input again.')
+				else:
+					print('Wrong or no-exist dir(s) number(s)! Input again.')
+			else:
+				print('Wrong input data! Try again.')
+
+	def user_input_dirs_numbers_correct(self, user_input_dirs_numbers: set):
+		for user_dir_number in user_input_dirs_numbers:
+			if user_dir_number in self.selected_partition_root_dir_abs_pathes_by_numbers.keys():
+				continue
+			else:
+				return False
+		return True
 
 	def show_partitions_info_for_user(self):
 		print(f'[INFO] Found {len(self.user_data_disk_devices_mountpoints)} disk partitions.')
@@ -185,6 +228,7 @@ class Partition_Music_Dir_Searcher:
 		self.current_search_abs_dir_path = root_abs_dir_path  # maybe for now. [WARNING]
 
 		while not filesystem_tree_from_certain_dir_entire_checked(self.dirs_by_levels_and_checked_status):
+			# TODO: add condition for excluded dirs - as checked status.
 			if directories_exists_in_dir(self.current_search_abs_dir_path) and self.search_to_bottom:
 
 				self.set_search_status_as_checked_for_dir(self.current_search_abs_dir_path)
