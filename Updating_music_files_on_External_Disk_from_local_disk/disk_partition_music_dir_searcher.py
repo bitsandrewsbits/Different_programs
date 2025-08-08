@@ -61,6 +61,7 @@ class Partition_Music_Dir_Searcher:
 			self.show_selected_partition_root_dirnames_by_numbers()
 			if self.define_user_excluded_dirs_abs_pathes():
 				break
+		self.add_root_dirs_abs_pathes_to_dirs_by_levels_with_checked_status()
 		return True # only interrupt for testing!
 		
 		# searching algorithm
@@ -184,6 +185,10 @@ class Partition_Music_Dir_Searcher:
 				return False
 		return True
 
+	def add_root_dirs_abs_pathes_to_dirs_by_levels_with_checked_status(self):
+		for excluded_root_dir_abs_path in self.excluded_partition_root_dirs_abs_pathes_from_searching:
+			self.dirs_by_levels_and_checked_status[excluded_root_dir_abs_path] = [1, "Checked"]
+
 	def show_partitions_info_for_user(self):
 		print(f'[INFO] Found {len(self.user_data_disk_devices_mountpoints)} disk partitions.')
 		print('Partitions:')
@@ -229,6 +234,8 @@ class Partition_Music_Dir_Searcher:
 
 		while not filesystem_tree_from_certain_dir_entire_checked(self.dirs_by_levels_and_checked_status):
 			# TODO: add condition for excluded dirs - as checked status.
+			# if self.current_search_abs_dir_path in self.dirs_by_levels_and_checked_status.keys():
+			# 	continue
 			if directories_exists_in_dir(self.current_search_abs_dir_path) and self.search_to_bottom:
 
 				self.set_search_status_as_checked_for_dir(self.current_search_abs_dir_path)
