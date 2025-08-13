@@ -79,6 +79,8 @@ class Partition_Music_Dir_Searcher:
 
 	def reset_all_paramaters_for_new_search(self):
 		self.all_disk_devices_mountpoints = {}
+		self.selected_partition_root_dir_abs_pathes_by_numbers = {}
+		self.excluded_partition_root_dirs_abs_pathes_from_searching = []
 		self.user_data_disk_devices_mountpoints = {}
 		self.dirs_with_nonzero_amount_of_MP3_files = {}    # {'dir_abs_path': number_of_MP3_files}
 		self.dirs_by_levels_and_checked_status = {}    # {'dir_abs_path': [1, 'Unchecked']} - [dir_level_int, str]
@@ -146,11 +148,13 @@ class Partition_Music_Dir_Searcher:
 
 	def define_user_excluded_dirs_abs_pathes(self):
 		while True:
-			user_selected_dirs_numbers = input(
-				"Select number of dir for excluding from searching\nFor multiple choise, numbers via whitespace:"
-			)
-			if user_selected_dirs_numbers == 'e':
-				return False
+			print("Select number of dir for excluding from searching.")
+			print("For multiple choise, numbers via whitespace")
+			print("[press e or Enter to skip excluding]: ", end = '')
+			user_selected_dirs_numbers = input()
+						
+			if user_selected_dirs_numbers == 'e' or user_selected_dirs_numbers == '':
+				return True
 			user_answer_elements = get_string_elements_splitting_by_whitespace(user_selected_dirs_numbers)
 			if ''.join(user_answer_elements).isdigit():
 				user_dirs_numbers = set([int(number) for number in user_answer_elements])
